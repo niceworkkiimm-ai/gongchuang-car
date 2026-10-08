@@ -2,6 +2,8 @@
 
 此仓库备份本项目的 STM32 主控代码、视觉代码、赛题与硬件资料、已有修改快照，以及项目对话记录。仓库应保持私有。
 
+GitHub 私有仓库：https://github.com/niceworkkiimm-ai/gongchuang-car
+
 ## 目录
 
 - `stm32/`：当前使用的“小车只加通信版本”工程，Keil 项目入口为 `stm32/PRJ/STM32_UART_CMD.uvprojx`。
