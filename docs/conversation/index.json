@@ -1,0 +1,12 @@
+{
+  "thread_id": "01a099e2-2f4e-73f1-9fc1-80c8880993d6",
+  "source_session_files": 27,
+  "messages": 811,
+  "last_message_time": "2026-10-08T06:07:25.442Z",
+  "months": [
+    "2026-09",
+    "2026-10"
+  ],
+  "available_images": 4,
+  "note": "Only visible UserMessage/AgentMessage items; unavailable attachments are not reconstructed."
+}

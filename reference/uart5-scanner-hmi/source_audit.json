@@ -1,0 +1,10 @@
+{
+  "changed_source_or_project": [
+    "hardware\\uart_5.c"
+  ],
+  "identical_source_or_project_count": 97,
+  "original_warning_count": 32,
+  "modified_warning_count": 32,
+  "same_warnings_ignoring_line_numbers": true,
+  "tested_source_sha256": "d0555de5d5b74e50a32b632ec82de5acbacce97a10105fe73361a4001e8a8b1f"
+}

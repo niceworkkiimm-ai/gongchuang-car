@@ -1,0 +1,9 @@
+{
+  "source_changes": [
+    "BSP\\openmv.c"
+  ],
+  "build_errors": 0,
+  "existing_warnings": 35,
+  "new_warnings": 0,
+  "hardware_test": "pending"
+}

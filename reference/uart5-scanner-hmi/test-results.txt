@@ -1,0 +1,21 @@
+UART5 real C ARM execution tests
+Source: C:\Users\user\Desktop\UART5_Scanner_HMI\小车只加通信版本\hardware\uart_5.c
+SHA256: d0555de5d5b74e50a32b632ec82de5acbacce97a10105fe73361a4001e8a8b1f
+COMMAND: C:\Keil5\ARM\ARMCLANG\bin\armclang.exe --target=arm-arm-none-eabi -mcpu=cortex-m3 -mthumb -O0 -ffreestanding -fno-builtin -c uart5_harness.c -o uart5_harness.o
+
+COMMAND: C:\Keil5\ARM\ARMCC\bin\armlink.exe --cpu=Cortex-M3 --entry=entry --ro_base=0x10000 --rw_base=0x20000000 --no_scanlib --no_remove uart5_harness.o -o uart5_harness.axf
+
+PASS display_extended: return=0, pc=0xf0000
+  Captured UART TX (25 bytes): b'page0.t0.txt="162+132"\xff\xff\xff'; hex=70 61 67 65 30 2e 74 30 2e 74 78 74 3d 22 31 36 32 2b 31 33 32 22 ff ff ff
+PASS motion_lock: return=0, pc=0xf0000
+PASS extended_then_motion: return=0, pc=0xf0000
+PASS invalid_and_recovery: return=0, pc=0xf0000
+PASS latest_waiting: return=0, pc=0xf0000
+PASS active_frame_immutable: return=0, pc=0xf0000
+PASS simultaneous_rx_tx: return=0, pc=0xf0000
+PASS rx_errors: return=0, pc=0xf0000
+PASS poll_receive: return=0, pc=0xf0000
+PASS reinitialize: return=0, pc=0xf0000
+RESULT: 10/10 test groups passed
+Coverage: 24 active-frame split points; 16 error combinations (4 flags x IRQ/poll x RXNE set/clear); 10 invalid inputs.
+Limits: mocked peripherals; no physical UART baud, electrical, display rendering or interrupt timing verification.

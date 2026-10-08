@@ -1,0 +1,14 @@
+{
+  "source_changes": [
+    "hardware\\wuliao.c"
+  ],
+  "tray_angles": [
+    17,
+    -20,
+    305
+  ],
+  "scanner_order": "preserved",
+  "build_errors": 0,
+  "new_warnings": 0,
+  "hardware_test": "pending"
+}

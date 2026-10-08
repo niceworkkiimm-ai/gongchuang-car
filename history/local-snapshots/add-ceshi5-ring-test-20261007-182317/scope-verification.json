@@ -1,0 +1,17 @@
+{
+  "added_function": "ceshi5",
+  "simulated_scan": "123+321",
+  "ring_order_indices": [
+    6,
+    5,
+    4
+  ],
+  "sample_ring_order": [
+    1,
+    2,
+    3
+  ],
+  "existing_task_code": "byte-identical",
+  "copied_ring_body": "byte-identical to cujiagong",
+  "main": "unchanged"
+}

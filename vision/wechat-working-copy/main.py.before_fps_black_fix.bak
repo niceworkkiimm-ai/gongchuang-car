@@ -1,0 +1,187 @@
+# run_all.py
+# 圆检测 + 颜色识别 + 数字识别（YOLOv5）+ 串口
+# 三合一：YOLO 跳帧运行，避免 NPU 过载
+
+from maix import app, camera, display, image, time, uart, pinmap, nn
+
+from config import CAM_W, CAM_H
+from detector import detect_all
+from color_detector import detect_colors
+
+
+# ========= UART =========
+pinmap.set_pin_function("A17", "UART0_RX")
+pinmap.set_pin_function("A16", "UART0_TX")
+ser = uart.UART("/dev/ttyS0", 115200)
+
+# ---- AI 模型 ----
+MODEL_PATH = "/root/models/hao/model_298897.mud"
+
+# YOLO 每 N 帧跑一次
+YOLO_SKIP = 2
+
+# 颜色停车信号最小发送间隔，避免同一物块重复刷屏
+COLOR_SEND_GAP_MS = 300
+
+# ============================================================
+# 有效标签集合（只有这些标签才被当成数字发送）
+# 模型可能还会检出其他东西，不在这个集合里的忽略
+# ============================================================
+VALID_LABELS = {
+    "zero", "one", "two", "three", "four",
+    "five", "six", "seven", "eight", "nine",
+}
+
+
+# ========= 颜色显示 =========
+COLOR_DISP = {
+    1: image.Color.from_rgb(220, 30, 30),
+    2: image.Color.from_rgb(255, 215, 0),
+    3: image.Color.from_rgb(15, 110, 200),
+    4: image.Color.from_rgb(35, 180, 70),
+    5: image.COLOR_WHITE,
+    6: image.Color.from_rgb(80, 190, 230),
+}
+
+
+def run():
+    G = image.COLOR_GREEN
+    R = image.COLOR_RED
+    B = image.COLOR_BLUE
+    Y = image.COLOR_YELLOW
+    W = image.COLOR_WHITE
+
+    # ---- 加载 YOLO ----
+    detector = None
+    yolo_w, yolo_h = 224, 224
+
+    try:
+        detector = nn.YOLOv5(model=MODEL_PATH, dual_buff=True)
+        yolo_w = detector.input_width()
+        yolo_h = detector.input_height()
+        print("[model] YOLOv5 loaded: %s (%dx%d)" % (MODEL_PATH, yolo_w, yolo_h))
+        # 打印模型所有标签，方便核对
+        if detector.labels:
+            print("[model] labels: %s" % list(detector.labels))
+        else:
+            print("[model] no labels in model, will use class_id directly")
+    except Exception as e:
+        print("[model] YOLOv5 load failed: %s" % e)
+
+    # ---- 摄像头 ----
+    cam = camera.Camera(CAM_W, CAM_H)
+    disp = display.Display()
+
+    frame_cnt = 0
+    last_digits = []
+    last_yolo_objs = []  # 缓存上一次 YOLO 检测框
+    last_color_send_ms = 0
+
+    while not app.need_exit():
+        img = cam.read()
+        frame_cnt += 1
+
+        # =============================================
+        # A. 快速颜色停车检测
+        # 读到图后先检测颜色并立刻发给 STM32，不等 YOLO / 圆检测。
+        # =============================================
+        colors = detect_colors(img)
+        now_ms = time.ticks_ms()
+
+        if colors and (now_ms - last_color_send_ms) >= COLOR_SEND_GAP_MS:
+            data = [str(c["color_id"]) for c in colors]
+            ser.write((",".join(data) + "\r\n").encode())
+            last_color_send_ms = now_ms
+
+        # =============================================
+        # B. 数字识别（跳帧）
+        # =============================================
+        digits = last_digits
+        yolo_objs = last_yolo_objs
+
+        run_yolo = (detector is not None) and (frame_cnt % YOLO_SKIP == 0)
+
+        if run_yolo:
+            try:
+                yolo_img = img.resize(yolo_w, yolo_h)
+                objs = detector.detect(yolo_img, conf_th=0.5, iou_th=0.45)
+
+                digits = []
+                yolo_objs = []
+
+                for obj in objs:
+                    raw_label = detector.labels[obj.class_id] if detector.labels else str(obj.class_id)
+                    score = obj.score if hasattr(obj, 'score') else 0
+
+                    # 只有 VALID_LABELS 里的标签才算有效数字
+                    if raw_label in VALID_LABELS:
+                        digits.append(raw_label)
+
+                    yolo_objs.append({
+                        "x": int(obj.x * CAM_W / yolo_w),
+                        "y": int(obj.y * CAM_H / yolo_h),
+                        "w": int(obj.w * CAM_W / yolo_w),
+                        "h": int(obj.h * CAM_H / yolo_h),
+                        "label": raw_label,
+                        "score": score,
+                    })
+
+                last_digits = digits
+                last_yolo_objs = yolo_objs
+
+            except Exception as e:
+                digits = last_digits
+                yolo_objs = last_yolo_objs
+
+        # =============================================
+        # C. 圆检测
+        # =============================================
+        img_cv = image.image2cv(img, False, False)
+        holes = detect_all(img_cv)
+
+        for h in holes:
+            hole = h["hole"]
+            img.draw_circle(hole["cx"], hole["cy"], hole["r"], B, thickness=2)
+
+            if h["inner"]:
+                c = h["inner"]["center"]
+                img.draw_circle(c["cx"], c["cy"], c["r"], Y, thickness=3)
+                img.draw_cross(c["cx"], c["cy"], R, size=6, thickness=2)
+
+        # =============================================
+        # D. 颜色画框（检测已在本帧最前面完成）
+        # =============================================
+        for c in colors:
+            col = COLOR_DISP.get(c["color_id"], G)
+            img.draw_circle(c["cx"], c["cy"], c["r"], col, thickness=3)
+            img.draw_string(c["cx"], c["cy"], c["name"], col)
+
+        # ---- 最后画 YOLO 框 ----
+        for obj in yolo_objs:
+            img.draw_rect(obj["x"], obj["y"], obj["w"], obj["h"], color=R, thickness=2)
+            img.draw_string(obj["x"], obj["y"] - 12,
+                            f'{obj["label"]}: {obj["score"]:.2f}', color=W, scale=1)
+
+        # ---- 底部数字汇总 ----
+        if digits:
+            img.draw_string(4, 220, "NUM: %s" % ",".join(digits), W, scale=1.5)
+
+        # =============================================
+        # E. 串口发送
+        # 颜色已经在本帧最前面优先发送，这里只发数字或无目标状态。
+        # =============================================
+        if digits:
+            ser.write((",".join(digits) + "\r\n").encode())
+        elif not colors:
+            ser.write(b"0\r\n")
+
+        # 顶部状态栏
+        yolo_mark = "Y" if run_yolo else "y"
+        img.draw_string(5, 5, "fps:%d %s:%d R:%d C:%d" % (
+            int(time.fps()), yolo_mark, len(digits), len(holes), len(colors)), G)
+
+        disp.show(img)
+
+
+if __name__ == "__main__":
+    run()

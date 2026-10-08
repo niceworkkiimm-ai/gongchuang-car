@@ -1,0 +1,15 @@
+{
+  "scope": "cujiagong only",
+  "changed_indices": 9,
+  "order": [
+    2,
+    1,
+    0
+  ],
+  "six_qr_permutations": "PASS",
+  "tray_order": [
+    1,
+    2,
+    3
+  ]
+}

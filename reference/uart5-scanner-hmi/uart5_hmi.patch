@@ -1,0 +1,134 @@
+--- original/hardware/uart_5.c
++++ modified/hardware/uart_5.c
+@@ -13,7 +13,7 @@
+ 引脚占用：
+ UART5_TX        PC12                                                                                                                                                          
+ UART5_RX        PD2
+-用于OpenMv_1串口通信
++扫码模块 TX 接 PD2，串口屏 RX 接 PC12；屏幕 TX 不接。
+ */
+ ///////////////////////////////////////////////////////
+ volatile uint8_t saoma_ready = 0;
+@@ -29,6 +29,60 @@
+ static uint8_t scan_count = 0;
+ uint8_t saoma_data[1000];
+ 
++/* UART5 RX: scanner; UART5 TX: HMI. Only the newest waiting scan is kept.
++ * Queue access is serialized by UART5 IRQ or Scanner_PollReceive's IRQ mask.
++ * An active frame is private to the TX ISR and is never overwritten by RX.
++ */
++#define HMI_SCAN_LENGTH 7U
++#define HMI_COMMAND_PREFIX "page0.t0.txt=\""
++#define HMI_FRAME_LENGTH ((sizeof(HMI_COMMAND_PREFIX) - 1U) + HMI_SCAN_LENGTH + 4U)
++static volatile uint8_t hmi_pending_scan[HMI_SCAN_LENGTH];
++static volatile uint8_t hmi_pending = 0;
++static uint8_t hmi_tx_frame[HMI_FRAME_LENGTH];
++static uint8_t hmi_tx_index = HMI_FRAME_LENGTH;
++
++static void HMI_QueueScan(const uint8_t *scan)
++{
++    uint8_t i;
++    for (i = 0; i < HMI_SCAN_LENGTH; ++i)
++        hmi_pending_scan[i] = scan[i];
++    hmi_pending = 1;
++    USART_ITConfig(UART5, USART_IT_TXE, ENABLE);
++}
++
++/* Called only with TXE set. No waits, printf, delays or OLED work in the ISR. */
++static void HMI_TransmitByte(void)
++{
++    static const char prefix[] = HMI_COMMAND_PREFIX;
++    uint8_t i;
++    uint8_t pos;
++
++    if (hmi_tx_index == HMI_FRAME_LENGTH)
++    {
++        if (!hmi_pending)
++        {
++            USART_ITConfig(UART5, USART_IT_TXE, DISABLE);
++            return;
++        }
++        pos = 0;
++        for (i = 0; i < sizeof(prefix) - 1U; ++i)
++            hmi_tx_frame[pos++] = (uint8_t)prefix[i];
++        for (i = 0; i < HMI_SCAN_LENGTH; ++i)
++            hmi_tx_frame[pos++] = hmi_pending_scan[i];
++        hmi_tx_frame[pos++] = '"';
++        hmi_tx_frame[pos++] = 0xFF;
++        hmi_tx_frame[pos++] = 0xFF;
++        hmi_tx_frame[pos] = 0xFF;
++        hmi_pending = 0;
++        hmi_tx_index = 0;
++    }
++
++    USART_SendData(UART5, hmi_tx_frame[hmi_tx_index++]);
++    if ((hmi_tx_index == HMI_FRAME_LENGTH) && !hmi_pending)
++        USART_ITConfig(UART5, USART_IT_TXE, DISABLE);
++}
++
++
+ 
+ volatile uint8_t uart5_RxData;              // UART5 接收到的数据
+ void uart_init5()
+@@ -46,6 +100,10 @@
+     scanner_last_error = 0;
+     scanner_pd2_level = 1;
+     scan_count = 0;
++    hmi_pending = 0;
++    hmi_tx_index = HMI_FRAME_LENGTH;
++    memset((void *)hmi_pending_scan, 0, sizeof(hmi_pending_scan));
++    memset(hmi_tx_frame, 0, sizeof(hmi_tx_frame));
+     memset(saoma_data, 0, sizeof(saoma_data));
+ 
+     /* 开启UART5，GPIOC和GPIOD的时钟 */
+@@ -54,6 +112,7 @@
+     
+     /* 复位串口5 */
+     USART_DeInit(UART5);
++    USART_ITConfig(UART5, USART_IT_TXE, DISABLE);
+ 
+     /*--------------------------GPIO端配置-----------------------------*/
+     //UART5_TX   GPIOC.12   复用推排输出
+@@ -189,12 +248,12 @@
+ 
+ /* 原始扫码内容格式为 123+321；接受 CR、CRLF、DT 或无后缀。
+  * 使用固定长度窗口寻找有效内容，不把模块应答和前后缀当作物料编号。
+- * 当前任务只使用颜色编号 1、2、3，锁定本次上电的第一组有效数据。
++ * 屏幕接受前三位 1~6、后三位 1~3，并显示最新扫码内容。
++ * 运动任务仍只使用颜色编号 1、2、3，锁定本次上电的第一组有效数据。
+  */
+ static void Scanner_ReceiveByte(uint8_t data)
+ {
+     uint8_t i;
+-    if (saoma_ready) return;
+ 
+     if (scan_count == sizeof(scan_window))
+     {
+@@ -208,8 +267,16 @@
+     for (i = 0; i < sizeof(scan_window); ++i)
+     {
+         if (i == 3) continue;
+-        if (scan_window[i] < '1' || scan_window[i] > '3') return;
+-    }
++        if (scan_window[i] < '1') return;
++        if (scan_window[i] > ((i < 3) ? '6' : '3')) return;
++    }
++
++    HMI_QueueScan(scan_window);
++
++    /* Preserve the original motion data: first scan containing only 1..3. */
++    if (saoma_ready) return;
++    for (i = 0; i < 3; ++i)
++        if (scan_window[i] > '3') return;
+ 
+     memcpy(saoma_data, scan_window, sizeof(scan_window));
+     saoma_data[7] = '\0';
+@@ -259,6 +326,8 @@
+             scan_count = 0;
+         }
+     }
++    if (USART_GetITStatus(UART5, USART_IT_TXE) != RESET)
++        HMI_TransmitByte();
+ }
+ 
+ /* 前台接收通道：只有当 RXNE 已经置位、中断却没有来处理时才会收到字节。

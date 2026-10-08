@@ -1,0 +1,17 @@
+id: gc
+name: gc
+version: 4.12.4
+author: haohaohao
+icon: app.png
+desc: wu
+files:
+  - app.png
+  - app.yaml
+  - calibrate.py
+  - color_config.py
+  - color_detector.py
+  - config.py
+  - detector.py
+  - main.py
+  - serial_link.py
+  - task.py

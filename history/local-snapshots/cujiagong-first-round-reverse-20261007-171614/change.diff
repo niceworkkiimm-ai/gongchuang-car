@@ -1,0 +1,47 @@
+--- task.before.c
++++ task.after.c
+@@ -429,3 +429,3 @@
+ 	/* At the rings: car(1) moves toward ring 1; car(2) toward ring 3. */
+-	if (saoma_data[0] == '1'){
++	if (saoma_data[2] == '1'){
+ 		car(1,500,1850*4);
+@@ -441,3 +441,3 @@
+ 			
+-			if (saoma_data[2]=='3'){
++			if (saoma_data[0]=='3'){
+ 				car(2,500,1850*4);
+@@ -467,3 +467,3 @@
+ 			fwuliao2();
+-			if (saoma_data[2] == '2'){
++			if (saoma_data[0] == '2'){
+ 				car(1,500,1850*4);
+@@ -490,3 +490,3 @@
+ 	
+-	if (saoma_data[0] == '2'){
++	if (saoma_data[2] == '2'){
+ 			fuwei();
+@@ -500,3 +500,3 @@
+ 			fwuliao2();
+-			if (saoma_data[2] == '3'){
++			if (saoma_data[0] == '3'){
+ 				
+@@ -527,3 +527,3 @@
+ 			fwuliao2();
+-			if (saoma_data[2] == '1'){
++			if (saoma_data[0] == '1'){
+ 				car(1,500,3700*4);
+@@ -550,3 +550,3 @@
+ 	
+-	if (saoma_data[0] == '3'){
++	if (saoma_data[2] == '3'){
+ 		car(2,500,1850*4);
+@@ -561,3 +561,3 @@
+ 			fwuliao2();
+-			if (saoma_data[2] == '1'){
++			if (saoma_data[0] == '1'){
+ 				car(1,500,1850*4);
+@@ -587,3 +587,3 @@
+ 			fwuliao2();
+-			if (saoma_data[2] == '2'){
++			if (saoma_data[0] == '2'){
+ 				car(2,500,1850*4);

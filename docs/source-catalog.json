@@ -1,0 +1,122 @@
+[
+  {
+    "label": "当前C盘主控工程",
+    "destination": "stm32",
+    "files": 116
+  },
+  {
+    "label": "工创原始资料与初版备份",
+    "destination": "reference/original-workspace",
+    "files": 151
+  },
+  {
+    "label": "微信视觉源码工作副本，实际烧录版本未核实",
+    "destination": "vision/wechat-working-copy",
+    "files": 15
+  },
+  {
+    "label": "用户提供的视觉压缩包原件",
+    "destination": "vision/provided-archives/Visual_Material_Recognition_backup_max.zip",
+    "files": 1
+  },
+  {
+    "label": "视觉压缩包解压审阅副本",
+    "destination": "vision/backup-max-review-copy",
+    "files": 13
+  },
+  {
+    "label": "用于核对粗加工顺序的用户压缩包",
+    "destination": "history/provided-archives/小车只加通信版本 (2)-钟文-28.zip",
+    "files": 1
+  },
+  {
+    "label": "用户原版完整主控工程",
+    "destination": "reference/stm32-wechat-original",
+    "files": 106
+  },
+  {
+    "label": "此前称为2文件的主控工程",
+    "destination": "reference/stm32-file2",
+    "files": 110
+  },
+  {
+    "label": "王凯路线参考代码",
+    "destination": "reference/wangkai-route",
+    "files": 104
+  },
+  {
+    "label": "UART5及串口屏参考工程",
+    "destination": "reference/uart5-scanner-hmi",
+    "files": 118
+  },
+  {
+    "label": "ZDT X42S电机手册",
+    "destination": "reference/manuals/ZDT_X42S第二代闭环步进电机用户手册V1.0.5.pdf",
+    "files": 1
+  },
+  {
+    "label": "此前保存的修改快照：add-ceshi5-ring-test-20261007-182317",
+    "destination": "history/local-snapshots/add-ceshi5-ring-test-20261007-182317",
+    "files": 113
+  },
+  {
+    "label": "此前保存的修改快照：correct-restore-order-scope-20261007-164114",
+    "destination": "history/local-snapshots/correct-restore-order-scope-20261007-164114",
+    "files": 237
+  },
+  {
+    "label": "此前保存的修改快照：cujiagong-first-round-reverse-20261007-171614",
+    "destination": "history/local-snapshots/cujiagong-first-round-reverse-20261007-171614",
+    "files": 112
+  },
+  {
+    "label": "此前保存的修改快照：cujiagong-order-redo-20261007-172936",
+    "destination": "history/local-snapshots/cujiagong-order-redo-20261007-172936",
+    "files": 1
+  },
+  {
+    "label": "此前保存的修改快照：cujiagong-order-undo-20261007-172654",
+    "destination": "history/local-snapshots/cujiagong-order-undo-20261007-172654",
+    "files": 1
+  },
+  {
+    "label": "此前保存的修改快照：cujiagong-separate-vision-center-20261007-181455",
+    "destination": "history/local-snapshots/cujiagong-separate-vision-center-20261007-181455",
+    "files": 115
+  },
+  {
+    "label": "此前保存的修改快照：cujiagong-use-last-three-reverse-20261007-174910",
+    "destination": "history/local-snapshots/cujiagong-use-last-three-reverse-20261007-174910",
+    "files": 110
+  },
+  {
+    "label": "此前保存的修改快照：fwuliao-delay-fix-20261007-150424",
+    "destination": "history/local-snapshots/fwuliao-delay-fix-20261007-150424",
+    "files": 118
+  },
+  {
+    "label": "此前保存的修改快照：fwuliao-swap-tray-references-20261007-173731",
+    "destination": "history/local-snapshots/fwuliao-swap-tray-references-20261007-173731",
+    "files": 110
+  },
+  {
+    "label": "此前保存的修改快照：gongchuang-vision-feedback-fix-20261003",
+    "destination": "history/local-snapshots/gongchuang-vision-feedback-fix-20261003",
+    "files": 112
+  },
+  {
+    "label": "此前保存的修改快照：restore-qr-placement-order-20261007-160639",
+    "destination": "history/local-snapshots/restore-qr-placement-order-20261007-160639",
+    "files": 355
+  },
+  {
+    "label": "此前保存的修改快照：ring-car-direction-fix-20261003-183456",
+    "destination": "history/local-snapshots/ring-car-direction-fix-20261003-183456",
+    "files": 238
+  },
+  {
+    "label": "此前保存的修改快照：wl-valid-feedback-fix-20261003-172222",
+    "destination": "history/local-snapshots/wl-valid-feedback-fix-20261003-172222",
+    "files": 241
+  }
+]

@@ -1,0 +1,162 @@
+# color_detector.py
+# MaixPy 颜色检测
+
+from color_config import *
+
+
+# 每个颜色面积限制
+AREA_LIMIT = {
+
+    1: 500,      # Red
+    2: 500,      # Yellow
+    3: 500,      # Blue
+    4: 500,      # Green
+    5: 2000,      # Black
+    6: 500       # Cyan 浅蓝
+
+}
+
+
+# 最大面积
+# 防止整个屏幕被识别
+MAX_AREA = {
+
+    1: 30000,
+    2: 30000,
+    3: 30000,
+    4: 30000,
+    5: 15000,
+    6: 30000
+
+}
+
+
+
+def detect_colors(img):
+
+    results = []
+
+
+    for cid, cfg in COLOR_LAB.items():
+
+
+        min_area = AREA_LIMIT.get(cid,500)
+        max_area = MAX_AREA.get(cid,30000)
+
+
+
+        blobs = img.find_blobs(
+
+            [cfg["lab"]],
+
+            pixels_threshold=min_area,
+
+            area_threshold=min_area,
+
+            # 不合并，避免阴影连起来
+            merge=False
+
+        )
+
+
+        if not blobs:
+            continue
+
+
+
+        # 找最大色块
+
+        b = max(
+            blobs,
+            key=lambda x:x.area()
+        )
+
+
+        area = b.area()
+
+
+
+        # 面积过滤
+
+        if area < min_area:
+            continue
+
+
+        if area > max_area:
+            continue
+
+
+
+        results.append({
+
+            "cx": b.cx(),
+
+            "cy": b.cy(),
+
+            "r": int(
+                (b.w()+b.h())/4
+            ),
+
+            "color_id": cid,
+
+            "name": cfg["name"],
+
+            "area": area
+
+        })
+
+
+
+    # =====================
+    # 重叠去除
+    # =====================
+
+    if len(results)<=1:
+        return results
+
+
+
+    keep=[]
+
+
+    for i,a in enumerate(results):
+
+        same=False
+
+
+        for j,b in enumerate(results):
+
+            if i==j:
+                continue
+
+
+            dis=(
+
+                (a["cx"]-b["cx"])**2
+
+                +
+
+                (a["cy"]-b["cy"])**2
+
+            )**0.5
+
+
+
+            # 同位置，小面积颜色丢掉
+
+            if dis < 20:
+
+                if a["area"] < b["area"]:
+
+                    same=True
+
+                    break
+
+
+
+        if not same:
+            keep.append(a)
+
+
+
+    return keep

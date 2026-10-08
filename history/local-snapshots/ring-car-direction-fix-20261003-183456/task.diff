@@ -1,0 +1,1141 @@
+--- task.before.c
+
++++ task.c
+
+@@ -420,48 +420,109 @@
+
+ 
+ 
+ 	//***********放物料*************
++	/* At the rings: car(1) moves toward ring 1; car(2) toward ring 3. */
+ 	if (saoma_data[0] == '1'){
+-		car(2,500,1850*4);
++		car(1,500,1850*4);
+ 			fuwei();		//识别并且调整
+ 		vision('4');
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[1] == '2'){
++			car(2,500,1850*4);
++				fuwei();
++			vision('5');
++			fwuliao2();
++			
++			if (saoma_data[2]=='3'){
++				car(2,500,1850*4);
++				fuwei();
++				vision('6');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++			//**************抓物料**************	
++				car(1,500,3700*4);
++				fnwuliao1();
++				zancun_na(2,500,1850*4,1);
++				fnwuliao2();
++				zancun_na(2,500,1850*4,2);
++				fnwuliao3();
++			}
++			}
++		
++		if (saoma_data[1] == '3'){
++			car(2,500,3700*4);
++				fuwei();
++			vision('6');
++			fwuliao2();
++			if (saoma_data[2] == '2'){
++				car(1,500,1850*4);
++				fuwei();
++				vision('5');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++				//**************抓物料**************	
++				car(1,500,1850*4);
++				fnwuliao1();
++				zancun_na(2,500,3700*4,1);
++				fnwuliao2();
++				zancun_na(1,500,1850*4,2);
++				fnwuliao3();
++			}
++		}
++	}
++	
++	
++	if (saoma_data[0] == '2'){
++			fuwei();
++		vision('5');
++		fwuliao1();
++		
++		if (saoma_data[1] == '1'){
+ 			car(1,500,1850*4);
+ 				fuwei();
+-			vision('5');
+-			fwuliao2();
+-			
+-			if (saoma_data[2]=='3'){
++			vision('4');
++			fwuliao2();
++			if (saoma_data[2] == '3'){
++				
++				car(2,500,3700*4);
++				fuwei();
++				vision('6');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++				//**************抓物料**************	
+ 				car(1,500,1850*4);
+-				fuwei();
+-				vision('6');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-			//**************抓物料**************	
+-				car(2,500,3700*4);
+ 				fnwuliao1();
+ 				zancun_na(1,500,1850*4,1);
+ 				fnwuliao2();
+-				zancun_na(1,500,1850*4,2);
+-				fnwuliao3();
+-			}
+-			}
++				zancun_na(2,500,3700*4,2);
++				fnwuliao3();
++			}
++		}
+ 		
+ 		if (saoma_data[1] == '3'){
+-			car(1,500,3700*4);
++			car(2,500,1850*4);
+ 				fuwei();
+ 			vision('6');
+ 			fwuliao2();
+-			if (saoma_data[2] == '2'){
+-				car(2,500,1850*4);
+-				fuwei();
+-				vision('5');
++			if (saoma_data[2] == '1'){
++				car(1,500,3700*4);
++				fuwei();
++				vision('4');
+ 				fwuliao3();
+ 				
+ 				if (anglea<180 && anglea>=0)
+@@ -472,69 +533,9 @@
+
+ 				//**************抓物料**************	
+ 				car(2,500,1850*4);
+ 				fnwuliao1();
+-				zancun_na(1,500,3700*4,1);
+-				fnwuliao2();
+-				zancun_na(2,500,1850*4,2);
+-				fnwuliao3();
+-			}
+-		}
+-	}
+-	
+-	
+-	if (saoma_data[0] == '2'){
+-			fuwei();
+-		vision('5');
+-		fwuliao1();
+-		
+-		if (saoma_data[1] == '1'){
+-			car(2,500,1850*4);
+-				fuwei();
+-			vision('4');
+-			fwuliao2();
+-			if (saoma_data[2] == '3'){
+-				
+-				car(1,500,3700*4);
+-				fuwei();
+-				vision('6');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-				//**************抓物料**************	
+-				car(2,500,1850*4);
+-				fnwuliao1();
+ 				zancun_na(2,500,1850*4,1);
+ 				fnwuliao2();
+-				zancun_na(1,500,3700*4,2);
+-				fnwuliao3();
+-			}
+-		}
+-		
+-		if (saoma_data[1] == '3'){
+-			car(1,500,1850*4);
+-				fuwei();
+-			vision('6');
+-			fwuliao2();
+-			if (saoma_data[2] == '1'){
+-				car(2,500,3700*4);
+-				fuwei();
+-				vision('4');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-				//**************抓物料**************	
+-				car(1,500,1850*4);
+-				fnwuliao1();
+-				zancun_na(1,500,1850*4,1);
+-				fnwuliao2();
+-				zancun_na(2,500,3900*4,2);
++				zancun_na(1,500,3900*4,2);
+ 				fnwuliao3();
+ 			}
+ 		}
+@@ -542,20 +543,46 @@
+
+ 	
+ 	
+ 	if (saoma_data[0] == '3'){
+-		car(1,500,1850*4);
++		car(2,500,1850*4);
+ 		fuwei();
+ 		vision('6');
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[1] == '2'){
+-			car(2,500,1850*4);
++			car(1,500,1850*4);
+ 				fuwei();
+ 			vision('5');
+ 			fwuliao2();
+ 			if (saoma_data[2] == '1'){
++				car(1,500,1850*4);
++				fuwei();
++				vision('4');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++				//**************抓物料**************	
++				car(2,500,3700*4);
++				fnwuliao1();
++				zancun_na(1,500,1850*4,1);
++				fnwuliao2();
++				zancun_na(1,500,1850*4,2);
++				fnwuliao3();
++			}
++		}
++		
++		if (saoma_data[1] == '1'){
++			car(1,500,3700*4);
++				fuwei();
++			vision('4');
++			fwuliao2();
++			if (saoma_data[2] == '2'){
+ 				car(2,500,1850*4);
+ 				fuwei();
+-				vision('4');
++				vision('5');
+ 				fwuliao3();
+ 				
+ 				if (anglea<180 && anglea>=0)
+@@ -564,37 +591,11 @@
+
+ 					car(0,-180,0);
+ 				delay_ms(100);
+ 				//**************抓物料**************	
+-				car(1,500,3700*4);
+-				fnwuliao1();
+-				zancun_na(2,500,1850*4,1);
++				car(2,500,1850*4);
++				fnwuliao1();
++				zancun_na(1,500,3700*4,1);
+ 				fnwuliao2();
+ 				zancun_na(2,500,1850*4,2);
+-				fnwuliao3();
+-			}
+-		}
+-		
+-		if (saoma_data[1] == '1'){
+-			car(2,500,3700*4);
+-				fuwei();
+-			vision('4');
+-			fwuliao2();
+-			if (saoma_data[2] == '2'){
+-				car(1,500,1850*4);
+-				fuwei();
+-				vision('5');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-				//**************抓物料**************	
+-				car(1,500,1850*4);
+-				fnwuliao1();
+-				zancun_na(2,500,3700*4,1);
+-				fnwuliao2();
+-				zancun_na(1,500,1850*4,2);
+ 				fnwuliao3();
+ 			}
+ 		}
+@@ -628,33 +629,33 @@
+
+ 
+ 		//***********放物料*************
+ 	if (saoma_data[0] == '1'){
+-		car(2,500,1850*4);
++		car(1,500,1850*4);
+ 			fuwei();
+ 		vision('4');
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[1] == '2'){
+-			car(1,500,1850*4);
++			car(2,500,1850*4);
+ 				fuwei();
+ 			vision('5');
+ 			fwuliao2();
+ 			
+ 			if (saoma_data[2]=='3'){
++				car(2,500,1850*4);
++				fuwei();
++				vision('6');
++				fwuliao3();
++
++			}
++			}
++		
++		if (saoma_data[1] == '3'){
++			car(2,500,3700*4);
++				fuwei();
++			vision('6');
++			fwuliao2();
++			if (saoma_data[2] == '2'){
+ 				car(1,500,1850*4);
+-				fuwei();
+-				vision('6');
+-				fwuliao3();
+-
+-			}
+-			}
+-		
+-		if (saoma_data[1] == '3'){
+-			car(1,500,3700*4);
+-				fuwei();
+-			vision('6');
+-			fwuliao2();
+-			if (saoma_data[2] == '2'){
+-				car(2,500,1850*4);
+ 				fuwei();
+ 				vision('5');
+ 				fwuliao3();
+@@ -670,27 +671,27 @@
+
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[1] == '1'){
++			car(1,500,1850*4);
++				fuwei();
++			vision('4');
++			fwuliao2();
++			if (saoma_data[2] == '3'){
++				car(2,500,3700*4);
++				fuwei();
++				vision('6');
++				fwuliao3();
++				
++			}
++		}
++		
++		if (saoma_data[1] == '3'){
+ 			car(2,500,1850*4);
+ 				fuwei();
+-			vision('4');
+-			fwuliao2();
+-			if (saoma_data[2] == '3'){
++			vision('6');
++			fwuliao2();
++			if (saoma_data[2] == '1'){
+ 				car(1,500,3700*4);
+ 				fuwei();
+-				vision('6');
+-				fwuliao3();
+-				
+-			}
+-		}
+-		
+-		if (saoma_data[1] == '3'){
+-			car(1,500,1850*4);
+-				fuwei();
+-			vision('6');
+-			fwuliao2();
+-			if (saoma_data[2] == '1'){
+-				car(2,500,3700*4);
+-				fuwei();
+ 				vision('4');
+ 				fwuliao3();
+ 				
+@@ -700,32 +701,32 @@
+
+ 	
+ 	
+ 	if (saoma_data[0] == '3'){
+-		car(1,500,1850*4);
++		car(2,500,1850*4);
+ 			fuwei();
+ 		vision('6');
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[1] == '2'){
+-			car(2,500,1850*4);
++			car(1,500,1850*4);
+ 				fuwei();
+ 			vision('5');
+ 			fwuliao2();
+ 			if (saoma_data[2] == '1'){
++				car(1,500,1850*4);
++				fuwei();
++				vision('4');
++				fwuliao3();
++
++			}
++		}
++		
++		if (saoma_data[1] == '1'){
++			car(1,500,3700*4);
++				fuwei();
++			vision('4');
++			fwuliao2();
++			if (saoma_data[2] == '2'){
+ 				car(2,500,1850*4);
+-				fuwei();
+-				vision('4');
+-				fwuliao3();
+-
+-			}
+-		}
+-		
+-		if (saoma_data[1] == '1'){
+-			car(2,500,3700*4);
+-				fuwei();
+-			vision('4');
+-			fwuliao2();
+-			if (saoma_data[2] == '2'){
+-				car(1,500,1850*4);
+ 				fuwei();
+ 				vision('5');
+ 				fwuliao3();
+@@ -877,60 +878,60 @@
+
+ 	//***********放物料*************
+ 	/* Placement order: QR digit 6 -> 5 -> 4, excluding the '+' separator. */
+ 	if (saoma_data[6] == '1'){
+-		car(2,500,1850*4);
++		car(1,500,1850*4);
+ 			fuwei();
+ 		vision('4');
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[5] == '2'){
+-			car(1,500,1850*4);
++			car(2,500,1850*4);
+ 				fuwei();
+ 			vision('5');
+ 			fwuliao2();
+ 			
+ 			if (saoma_data[4]=='3'){
++				car(2,500,1850*4);
++				fuwei();
++				vision('6');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++			//**************抓物料**************	
++				car(1,500,3700*4);
++				fnwuliao1();
++				zancun_na(2,500,1850*4,1);
++				fnwuliao2();
++				zancun_na(2,500,1850*4,2);
++				fnwuliao3();
++			}
++			}
++		
++		if (saoma_data[5] == '3'){
++			car(2,500,3700*4);
++				fuwei();
++			vision('6');
++			fwuliao2();
++			if (saoma_data[4] == '2'){
+ 				car(1,500,1850*4);
+ 				fuwei();
+-				vision('6');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-			//**************抓物料**************	
+-				car(2,500,3700*4);
+-				fnwuliao1();
+-				zancun_na(1,500,1850*4,1);
++				vision('5');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++				//**************抓物料**************	
++				car(1,500,1850*4);
++				fnwuliao1();
++				zancun_na(2,500,3700*4,1);
+ 				fnwuliao2();
+ 				zancun_na(1,500,1850*4,2);
+-				fnwuliao3();
+-			}
+-			}
+-		
+-		if (saoma_data[5] == '3'){
+-			car(1,500,3700*4);
+-				fuwei();
+-			vision('6');
+-			fwuliao2();
+-			if (saoma_data[4] == '2'){
+-				car(2,500,1850*4);
+-				fuwei();
+-				vision('5');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-				//**************抓物料**************	
+-				car(2,500,1850*4);
+-				fnwuliao1();
+-				zancun_na(1,500,3700*4,1);
+-				fnwuliao2();
+-				zancun_na(2,500,1850*4,2);
+ 				fnwuliao3();
+ 			}
+ 		}
+@@ -943,14 +944,40 @@
+
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[5] == '1'){
++			car(1,500,1850*4);
++				fuwei();
++			vision('4');
++			fwuliao2();
++			if (saoma_data[4] == '3'){
++				car(2,500,3700*4);
++				fuwei();
++				vision('6');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++				//**************抓物料**************	
++				car(1,500,1850*4);
++				fnwuliao1();
++				zancun_na(1,500,1850*4,1);
++				fnwuliao2();
++				zancun_na(2,500,3700*4,2);
++				fnwuliao3();
++			}
++		}
++		
++		if (saoma_data[5] == '3'){
+ 			car(2,500,1850*4);
+ 				fuwei();
+-			vision('4');
+-			fwuliao2();
+-			if (saoma_data[4] == '3'){
++			vision('6');
++			fwuliao2();
++			if (saoma_data[4] == '1'){
+ 				car(1,500,3700*4);
+ 				fuwei();
+-				vision('6');
++				vision('4');
+ 				fwuliao3();
+ 				
+ 				if (anglea<180 && anglea>=0)
+@@ -963,33 +990,7 @@
+
+ 				fnwuliao1();
+ 				zancun_na(2,500,1850*4,1);
+ 				fnwuliao2();
+-				zancun_na(1,500,3700*4,2);
+-				fnwuliao3();
+-			}
+-		}
+-		
+-		if (saoma_data[5] == '3'){
+-			car(1,500,1850*4);
+-				fuwei();
+-			vision('6');
+-			fwuliao2();
+-			if (saoma_data[4] == '1'){
+-				car(2,500,3700*4);
+-				fuwei();
+-				vision('4');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-				//**************抓物料**************	
+-				car(1,500,1850*4);
+-				fnwuliao1();
+-				zancun_na(1,500,1850*4,1);
+-				fnwuliao2();
+-				zancun_na(2,500,3900*4,2);
++				zancun_na(1,500,3900*4,2);
+ 				fnwuliao3();
+ 			}
+ 		}
+@@ -997,19 +998,45 @@
+
+ 	
+ 	
+ 	if (saoma_data[6] == '3'){
+-		car(1,500,1850*4);
++		car(2,500,1850*4);
+ 		vision('6');
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[5] == '2'){
+-			car(2,500,1850*4);
++			car(1,500,1850*4);
+ 				fuwei();
+ 			vision('5');
+ 			fwuliao2();
+ 			if (saoma_data[4] == '1'){
++				car(1,500,1850*4);
++				fuwei();
++				vision('4');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++				//**************抓物料**************	
++				car(2,500,3700*4);
++				fnwuliao1();
++				zancun_na(1,500,1850*4,1);
++				fnwuliao2();
++				zancun_na(1,500,1850*4,2);
++				fnwuliao3();
++			}
++		}
++		
++		if (saoma_data[5] == '1'){
++			car(1,500,3700*4);
++				fuwei();
++			vision('4');
++			fwuliao2();
++			if (saoma_data[4] == '2'){
+ 				car(2,500,1850*4);
+ 				fuwei();
+-				vision('4');
++				vision('5');
+ 				fwuliao3();
+ 				
+ 				if (anglea<180 && anglea>=0)
+@@ -1018,37 +1045,11 @@
+
+ 					car(0,-180,0);
+ 				delay_ms(100);
+ 				//**************抓物料**************	
+-				car(1,500,3700*4);
+-				fnwuliao1();
+-				zancun_na(2,500,1850*4,1);
++				car(2,500,1850*4);
++				fnwuliao1();
++				zancun_na(1,500,3700*4,1);
+ 				fnwuliao2();
+ 				zancun_na(2,500,1850*4,2);
+-				fnwuliao3();
+-			}
+-		}
+-		
+-		if (saoma_data[5] == '1'){
+-			car(2,500,3700*4);
+-				fuwei();
+-			vision('4');
+-			fwuliao2();
+-			if (saoma_data[4] == '2'){
+-				car(1,500,1850*4);
+-				fuwei();
+-				vision('5');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-				//**************抓物料**************	
+-				car(1,500,1850*4);
+-				fnwuliao1();
+-				zancun_na(2,500,3700*4,1);
+-				fnwuliao2();
+-				zancun_na(1,500,1850*4,2);
+ 				fnwuliao3();
+ 			}
+ 		}
+@@ -1080,19 +1081,19 @@
+
+ 		//***********放物料*************
+ 	/* Placement order: QR digit 6 -> 5 -> 4, excluding the '+' separator. */
+ 	if (saoma_data[6] == '1'){
+-		car(2,500,1850*4);
++		car(1,500,1850*4);
+ 			fuwei();
+ 		vision('1');
+ 		maduo1();
+ 		
+ 		if (saoma_data[5] == '2'){
+-			car(1,500,1850*4);
++			car(2,500,1850*4);
+ 				fuwei();
+ 			vision('2');
+ 			maduo2();
+ 			
+ 			if (saoma_data[4]=='3'){
+-				car(1,500,1850*4);
++				car(2,500,1850*4);
+ 					fuwei();
+ 				vision('3');
+ 				maduo_z(fang3);
+@@ -1101,12 +1102,12 @@
+
+ 			}
+ 		
+ 		if (saoma_data[5] == '3'){
+-			car(1,500,3700*4);
++			car(2,500,3700*4);
+ 				fuwei();
+ 			vision('3');
+ 			maduo2();
+ 			if (saoma_data[4] == '2'){
+-				car(2,500,1850*4);
++				car(1,500,1850*4);
+ 					fuwei();
+ 				vision('2');
+ 				maduo_z(fang3);
+@@ -1122,12 +1123,12 @@
+
+ 		maduo1();
+ 		
+ 		if (saoma_data[5] == '1'){
+-			car(2,500,1850*4);
++			car(1,500,1850*4);
+ 				fuwei();
+ 			vision('1');
+ 			maduo_z(fang2);
+ 			if (saoma_data[4] == '3'){
+-				car(1,500,3700*4);
++				car(2,500,3700*4);
+ 					fuwei();
+ 				vision('3');
+ 				maduo_z(fang3);
+@@ -1136,12 +1137,12 @@
+
+ 		}
+ 		
+ 		if (saoma_data[5] == '3'){
+-			car(1,500,1850*4);
++			car(2,500,1850*4);
+ 				fuwei();
+ 			vision('3');
+ 			maduo2();
+ 			if (saoma_data[4] == '1'){
+-				car(2,500,3700*4);
++				car(1,500,3700*4);
+ 					fuwei();
+ 				vision('1');
+ 				maduo3();
+@@ -1152,18 +1153,18 @@
+
+ 	
+ 	
+ 	if (saoma_data[6] == '3'){
+-		car(1,500,1850*4);
++		car(2,500,1850*4);
+ 			fuwei();
+ 		vision('3');
+ 		maduo1();
+ 		
+ 		if (saoma_data[5] == '2'){
+-			car(2,500,1850*4);
++			car(1,500,1850*4);
+ 				fuwei();
+ 			vision('2');
+ 			maduo_z(fang2);
+ 			if (saoma_data[4] == '1'){
+-				car(2,500,1850*4);
++				car(1,500,1850*4);
+ 					fuwei();
+ 				vision('1');
+ 				maduo3();
+@@ -1172,12 +1173,12 @@
+
+ 		}
+ 		
+ 		if (saoma_data[5] == '1'){
+-			car(2,500,3700*4);
++			car(1,500,3700*4);
+ 				fuwei();
+ 			vision('1');
+ 			maduo2();
+ 			if (saoma_data[4] == '2'){
+-				car(1,500,1850*4);
++				car(2,500,1850*4);
+ 					fuwei();
+ 				vision('2');
+ 				maduo_z(fang3);
+@@ -1331,47 +1332,107 @@
+
+ 	__set_PRIMASK(scan_test_irq_mask);
+ 
+ 		if (saoma_data[0] == '1'){
+-		car(2,500,1850*4);
++		car(1,500,1850*4);
+ 			fuwei();		//识别并且调整
+ 		vision('4');
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[1] == '2'){
++			car(2,500,1850*4);
++				fuwei();
++			vision('5');
++			fwuliao2();
++			
++			if (saoma_data[2]=='3'){
++				car(2,500,1850*4);
++				fuwei();
++				vision('6');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++			//**************抓物料**************	
++				car(1,500,3700*4);
++				fnwuliao1();
++				zancun_na(2,500,1850*4,1);
++				fnwuliao2();
++				zancun_na(2,500,1850*4,2);
++				fnwuliao3();
++			}
++			}
++		
++		if (saoma_data[1] == '3'){
++			car(2,500,3700*4);
++				fuwei();
++			vision('6');
++			fwuliao2();
++			if (saoma_data[2] == '2'){
++				car(1,500,1850*4);
++				fuwei();
++				vision('5');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++				//**************抓物料**************	
++				car(1,500,1850*4);
++				fnwuliao1();
++				zancun_na(2,500,3700*4,1);
++				fnwuliao2();
++				zancun_na(1,500,1850*4,2);
++				fnwuliao3();
++			}
++		}
++	}
++	
++	
++	if (saoma_data[0] == '2'){
++			fuwei();
++		vision('5');
++		fwuliao1();
++		
++		if (saoma_data[1] == '1'){
+ 			car(1,500,1850*4);
+ 				fuwei();
+-			vision('5');
+-			fwuliao2();
+-			
+-			if (saoma_data[2]=='3'){
++			vision('4');
++			fwuliao2();
++			if (saoma_data[2] == '3'){
++				
++				car(2,500,3700*4);
++				fuwei();
++				vision('6');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++				//**************抓物料**************	
+ 				car(1,500,1850*4);
+-				fuwei();
+-				vision('6');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-			//**************抓物料**************	
+-				car(2,500,3700*4);
+ 				fnwuliao1();
+ 				zancun_na(1,500,1850*4,1);
+ 				fnwuliao2();
+-				zancun_na(1,500,1850*4,2);
+-				fnwuliao3();
+-			}
+-			}
++				zancun_na(2,500,3700*4,2);
++				fnwuliao3();
++			}
++		}
+ 		
+ 		if (saoma_data[1] == '3'){
+-			car(1,500,3700*4);
++			car(2,500,1850*4);
+ 				fuwei();
+ 			vision('6');
+ 			fwuliao2();
+-			if (saoma_data[2] == '2'){
+-				car(2,500,1850*4);
+-				fuwei();
+-				vision('5');
++			if (saoma_data[2] == '1'){
++				car(1,500,3700*4);
++				fuwei();
++				vision('4');
+ 				fwuliao3();
+ 				
+ 				if (anglea<180 && anglea>=0)
+@@ -1382,69 +1443,9 @@
+
+ 				//**************抓物料**************	
+ 				car(2,500,1850*4);
+ 				fnwuliao1();
+-				zancun_na(1,500,3700*4,1);
+-				fnwuliao2();
+-				zancun_na(2,500,1850*4,2);
+-				fnwuliao3();
+-			}
+-		}
+-	}
+-	
+-	
+-	if (saoma_data[0] == '2'){
+-			fuwei();
+-		vision('5');
+-		fwuliao1();
+-		
+-		if (saoma_data[1] == '1'){
+-			car(2,500,1850*4);
+-				fuwei();
+-			vision('4');
+-			fwuliao2();
+-			if (saoma_data[2] == '3'){
+-				
+-				car(1,500,3700*4);
+-				fuwei();
+-				vision('6');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-				//**************抓物料**************	
+-				car(2,500,1850*4);
+-				fnwuliao1();
+ 				zancun_na(2,500,1850*4,1);
+ 				fnwuliao2();
+-				zancun_na(1,500,3700*4,2);
+-				fnwuliao3();
+-			}
+-		}
+-		
+-		if (saoma_data[1] == '3'){
+-			car(1,500,1850*4);
+-				fuwei();
+-			vision('6');
+-			fwuliao2();
+-			if (saoma_data[2] == '1'){
+-				car(2,500,3700*4);
+-				fuwei();
+-				vision('4');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-				//**************抓物料**************	
+-				car(1,500,1850*4);
+-				fnwuliao1();
+-				zancun_na(1,500,1850*4,1);
+-				fnwuliao2();
+-				zancun_na(2,500,3900*4,2);
++				zancun_na(1,500,3900*4,2);
+ 				fnwuliao3();
+ 			}
+ 		}
+@@ -1452,20 +1453,46 @@
+
+ 	
+ 	
+ 	if (saoma_data[0] == '3'){
+-		car(1,500,1850*4);
++		car(2,500,1850*4);
+ 		fuwei();
+ 		vision('6');
+ 		fwuliao1();
+ 		
+ 		if (saoma_data[1] == '2'){
+-			car(2,500,1850*4);
++			car(1,500,1850*4);
+ 				fuwei();
+ 			vision('5');
+ 			fwuliao2();
+ 			if (saoma_data[2] == '1'){
++				car(1,500,1850*4);
++				fuwei();
++				vision('4');
++				fwuliao3();
++				
++				if (anglea<180 && anglea>=0)
++					car(0,180,0);
++				else if( anglea>-180 && anglea <=0)
++					car(0,-180,0);
++				delay_ms(100);
++				//**************抓物料**************	
++				car(2,500,3700*4);
++				fnwuliao1();
++				zancun_na(1,500,1850*4,1);
++				fnwuliao2();
++				zancun_na(1,500,1850*4,2);
++				fnwuliao3();
++			}
++		}
++		
++		if (saoma_data[1] == '1'){
++			car(1,500,3700*4);
++				fuwei();
++			vision('4');
++			fwuliao2();
++			if (saoma_data[2] == '2'){
+ 				car(2,500,1850*4);
+ 				fuwei();
+-				vision('4');
++				vision('5');
+ 				fwuliao3();
+ 				
+ 				if (anglea<180 && anglea>=0)
+@@ -1474,40 +1501,14 @@
+
+ 					car(0,-180,0);
+ 				delay_ms(100);
+ 				//**************抓物料**************	
+-				car(1,500,3700*4);
+-				fnwuliao1();
+-				zancun_na(2,500,1850*4,1);
++				car(2,500,1850*4);
++				fnwuliao1();
++				zancun_na(1,500,3700*4,1);
+ 				fnwuliao2();
+ 				zancun_na(2,500,1850*4,2);
+ 				fnwuliao3();
+ 			}
+ 		}
+-		
+-		if (saoma_data[1] == '1'){
+-			car(2,500,3700*4);
+-				fuwei();
+-			vision('4');
+-			fwuliao2();
+-			if (saoma_data[2] == '2'){
+-				car(1,500,1850*4);
+-				fuwei();
+-				vision('5');
+-				fwuliao3();
+-				
+-				if (anglea<180 && anglea>=0)
+-					car(0,180,0);
+-				else if( anglea>-180 && anglea <=0)
+-					car(0,-180,0);
+-				delay_ms(100);
+-				//**************抓物料**************	
+-				car(1,500,1850*4);
+-				fnwuliao1();
+-				zancun_na(2,500,3700*4,1);
+-				fnwuliao2();
+-				zancun_na(1,500,1850*4,2);
+-				fnwuliao3();
+-			}
+-		}
+ 	}
+ 	
+ 	

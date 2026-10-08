@@ -1,0 +1,16 @@
+{
+  "resolution": [320, 240],
+  "center": [160, 120],
+  "send_every_processed_frames": 10,
+  "threshold_order": ["L_min", "L_max", "A_min", "A_max", "B_min", "B_max"],
+  "materials": [
+    {"mode": 1, "name": "红", "lab": [0, 80, 40, 80, 10, 80]},
+    {"mode": 2, "name": "黄", "lab": [60, 71, -11, -4, 35, 120]},
+    {"mode": 3, "name": "蓝", "lab": [4, 25, 4, 24, -42, -23]},
+    {"mode": 4, "name": "绿", "lab": [19, 39, -30, -11, -13, 33]},
+    {"mode": 5, "name": "黑", "lab": [0, 14, -4, 6, -11, 7]},
+    {"mode": 6, "name": "浅蓝", "lab": [21, 38, -13, 4, -51, -18]}
+  ],
+  "other_modes": {"0": "不识别", "7": "只识别圆环和数字"},
+  "note": "摄像头端对接参考；STM32工程不读取此JSON，尚未在MaixCAM设备上应用。"
+}

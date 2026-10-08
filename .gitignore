@@ -1,0 +1,14 @@
+# Local machine configuration and credentials
+.local/
+.env
+.env.*
+*.pem
+*.key
+# Rebuildable Keil/Python files
+**/Objects/
+**/Listings/
+**/__pycache__/
+*.pyc
+*.uvguix.*
+.DS_Store
+Thumbs.db

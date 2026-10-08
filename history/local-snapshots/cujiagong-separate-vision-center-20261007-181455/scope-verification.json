@@ -1,0 +1,16 @@
+{
+  "custom_center": [
+    155,
+    125
+  ],
+  "scope": "cujiagong only",
+  "calls_replaced": 15,
+  "route_and_qr_order": "unchanged",
+  "material_locator": "byte-identical",
+  "default_vision_uses": "original error_x/error_y",
+  "changed_files": [
+    "BSP/task.c",
+    "BSP/openmv.c",
+    "BSP/openmv.h"
+  ]
+}

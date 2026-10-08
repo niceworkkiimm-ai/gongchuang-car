@@ -1,0 +1,8 @@
+{
+  "route_cases_passed": 30,
+  "before_direction_failures": 30,
+  "source_changes": [
+    "BSP\\task.c"
+  ],
+  "hardware_test": "pending"
+}
