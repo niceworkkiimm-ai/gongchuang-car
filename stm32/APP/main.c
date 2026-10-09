@@ -136,8 +136,6 @@ int main(void)
 //		ceshi2();
 ///for(; ;);
 	//yuanhuanceshi();
-	ceshi5();
-	for(; ;);
 	
 	yuanliao();
 	cujiagong();

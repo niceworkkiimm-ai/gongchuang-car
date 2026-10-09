@@ -1,8 +1,12 @@
 # 工创小车项目
 
-此仓库备份本项目的 STM32 主控代码、视觉代码、赛题与硬件资料、已有修改快照，以及项目对话记录。仓库应保持私有。
+此仓库备份本项目的 STM32 主控代码、视觉代码、赛题与硬件资料、已有修改快照，以及项目对话记录。2026-10-09 核查时，个人仓库与 team 仓库均为公开仓库；这是实际设置，本次未修改可见性。
 
-GitHub 私有仓库：https://github.com/niceworkkiimm-ai/gongchuang-car
+个人仓库：https://github.com/niceworkkiimm-ai/gongchuang-car
+
+协作仓库：https://github.com/niceworkkiimm-ai/gongchuang-car-team
+
+项目接手记录见 [项目接手笔记](docs/项目接手笔记-2026-10-09.md)。
 
 ## 目录
 
@@ -18,13 +22,17 @@ GitHub 私有仓库：https://github.com/niceworkkiimm-ai/gongchuang-car
 
 原工程继续在 `C:\Users\Kim\Desktop\小车只加通信版本` 使用；本地 Git 仓库在 `D:\工创Git仓库\gongchuang-car`。
 
+用户于2026-10-09确认：桌面 `工创` 文件夹保留早期行走版、初版工程与赛题，不作为当前烧录工程。当前源码与仓库 `stm32/` 对应；后续先保存当前工程，再同步仓库。
+
 每次在 Keil 中保存修改后，双击本仓库中的 `备份到GitHub.cmd`。也可以运行下面的命令，并填写更具体的修改说明：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "D:\工创Git仓库\gongchuang-car\tools\backup.ps1" -Message "说明这次改了什么"
 ```
 
-脚本会同步工程和对话、保存 Git 提交并上传。未运行脚本或未进行提交的手动修改，不会自动出现在 GitHub。网络失败时，本地提交仍保留，可以再次运行上传。脚本没有设置定时任务或后台监听。
+脚本先拉取并核对 `origin/main` 和 `team/main`；若任一端有尚未合入的提交，会停止，避免覆盖协作者的修改。随后同步工程、保存 Git 提交，并分别推送两个仓库。任一仓库上传失败都会明确报告；本地提交保留，可修复后重试。未运行脚本或未进行提交的手动修改，不会自动出现在 GitHub。没有定时任务或后台监听。
+
+对话导出仅在当前 `CODEX_THREAD_ID` 与本机配置中的来源线程一致时更新；手动运行和其他线程保留既有历史导出，不读取旧线程会话日志。新对话可单独整理项目说明，不自动纳入历史聊天。
 
 同步只读取原始工程。它会保留原文件编码与换行；检测到直接修改了D盘备份时会停止，避免用C盘旧文件覆盖。源文件删除会对应记录为备份删除，仅涉及之前由同步脚本管理的文件。
 

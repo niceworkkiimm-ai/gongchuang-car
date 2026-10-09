@@ -2,12 +2,12 @@
   {
     "label": "当前C盘主控工程",
     "destination": "stm32",
-    "files": 116
+    "files": 117
   },
   {
     "label": "工创原始资料与初版备份",
     "destination": "reference/original-workspace",
-    "files": 151
+    "files": 152
   },
   {
     "label": "微信视觉源码工作副本，实际烧录版本未核实",

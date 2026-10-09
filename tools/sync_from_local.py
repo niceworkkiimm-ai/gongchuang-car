@@ -5,6 +5,7 @@ import collections
 import fnmatch
 import hashlib
 import json
+import os
 import re
 import shutil
 
@@ -126,7 +127,20 @@ def main():
             plan[key] = path
             copied += 1
         catalog.append({'label': source['label'], 'destination': source['destination'], 'files': copied})
-    generated, images = conversation(config)
+    # An unrelated/new chat may read historical exports but must not re-export
+    # another chat's session logs. Manual backup also retains existing exports.
+    if os.environ.get('CODEX_THREAD_ID') == config['thread_id']:
+        generated, images = conversation(config)
+        conversation_note = 'Conversation messages: ' + str(
+            json.loads(generated['docs/conversation/index.json'])['messages'])
+    else:
+        generated, images = {}, {}
+        archive = ROOT / 'docs' / 'conversation'
+        if archive.exists():
+            for path in sorted(archive.rglob('*')):
+                if path.is_file() and allowed(path.relative_to(ROOT)):
+                    plan[path.relative_to(ROOT).as_posix()] = path
+        conversation_note = 'Historical conversation exports retained; this is not the configured source chat.'
     plan.update(images)
     generated['docs/source-catalog.json'] = json.dumps(catalog, ensure_ascii=False, indent=2).encode('utf-8') + b'\n'
     hashes = {key: digest(path) for key, path in plan.items()}
@@ -162,7 +176,7 @@ def main():
             raise RuntimeError('Copy verification failed: ' + key)
     STATE.write_text(json.dumps(hashes, ensure_ascii=False, indent=2), encoding='utf-8')
     print('Verified backup files:', len(hashes))
-    print('Conversation messages:', json.loads(generated['docs/conversation/index.json'])['messages'])
+    print(conversation_note)
     print('Source files were not modified.')
 
 

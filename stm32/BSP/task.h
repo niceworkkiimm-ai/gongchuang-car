@@ -7,7 +7,6 @@
 void yuanliao();
 void yuanhuanceshi(void);
 void cujiagong();
-void ceshi5(void);
 void zancunqu();
 void yuanliao2();
 void cujiagong2();
