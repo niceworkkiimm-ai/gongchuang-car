@@ -123,7 +123,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U48005300160000353251524E -O206 -SF4000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP") -D00(1BA01477) -L00(0) -TO131090 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32F103ZE$Flash\STM32F10x_512.FLM)</Name>
+          <Name>-U-O206 -O206 -SF10000 -C0 -A0 -I0 -HNlocalhost -HP7184 -P1 -N00("ARM CoreSight SW-DP (ARM Core") -D00(1BA01477) -L00(0) -TO131090 -TC10000000 -TT10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512.FLM -FS08000000 -FL080000 -FP0($$Device:STM32F103ZE$Flash\STM32F10x_512.FLM) -WA0 -WE0 -WVCE4 -WS2710 -WM0 -WP2 -WK0</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -146,7 +146,40 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>58</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134234564</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>D:\姣旇禌\宸ュ垱\m\25榛慭灏忚溅榛戣壊锛堟牎璧涳級\灏忚溅榛戣壊锛堟渶鏂帮級\APP\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Template\../APP/main.c\58</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>157</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134236684</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>D:\姣旇禌\宸ュ垱\m\25榛慭灏忚溅榛戣壊锛堟牎璧涳級\灏忚溅榛戣壊锛堟渶鏂帮級\BSP\task.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Template\../BSP/task.c\157</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -176,6 +209,11 @@
       </WatchWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>
+        <Tp>
+          <Number>1000</Number>
+          <SubType>4</SubType>
+          <ItemText>saoma_data[1000], enabled==1</ItemText>
+        </Tp>
       </Tracepoint>
       <DebugFlag>
         <trace>0</trace>

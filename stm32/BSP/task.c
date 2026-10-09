@@ -1524,9 +1524,13 @@ void yuanhuanceshi(void )
 
 
 
-/* Simulated scan and camera ring-mode command only; no mechanical actions. */
+/* Coarse-processing test: restore each material to its original tray.
+ * Placement: tray 3/2/1 -> scan[6]/[5]/[4]; retrieval reverses this order. */
 void ceshi6(void)
 {
+	const int ring_center_x = 175;
+    const int ring_center_y = 139;
+
     const char simulated_scan[] = "123+321";
     uint32_t irq_mask;
     unsigned int i;
@@ -1539,4 +1543,198 @@ void ceshi6(void)
     __set_PRIMASK(irq_mask);
 
     Usart_SendByte4(UART4, 0x07); /* Raw numeric ring-recognition mode. */
+	
+	
+	zhou(guiwei);   
+	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降	
+	delay_ms(650);
+
+	
+
+
+	//***********放物料*************
+	/* At the rings: car(1) moves toward ring 1; car(2) toward ring 3. */
+	if (saoma_data[6] == '1'){
+		car(1,500,1850*4);
+			fuwei();		//识别并且调整
+		vision_at('4', ring_center_x, ring_center_y);
+		fwuliao1();
+		
+		if (saoma_data[5] == '2'){
+			car(2,500,1850*4);
+				fuwei();
+			vision_at('5', ring_center_x, ring_center_y);
+			fwuliao2();
+			
+			if (saoma_data[4]=='3'){
+				car(2,500,1850*4);
+				fuwei();
+				vision_at('6', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				car(0,-90,0);
+				delay_ms(100);
+			//**************抓物料**************	
+				/* Already at ring 3: recover tray 1, then rings 2/1 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(1,500,1850*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(1,500,1850*4,2);
+				fnwuliao3();
+			}
+			}
+		
+		if (saoma_data[5] == '3'){
+			car(2,500,3700*4);
+				fuwei();
+			vision_at('6', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '2'){
+				car(1,500,1850*4);
+				fuwei();
+				vision_at('5', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				car(0,-90,0);
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 2: recover tray 1, then rings 3/1 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(2,500,1850*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(1,500,3700*4,2);
+				fnwuliao3();
+			}
+		}
+	}
+	
+	
+	if (saoma_data[6] == '2'){
+			fuwei();
+		vision_at('5', ring_center_x, ring_center_y);
+		fwuliao1();
+		
+		if (saoma_data[5] == '1'){
+			car(1,500,1850*4);
+				fuwei();
+			vision_at('4', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '3'){
+				
+				car(2,500,3700*4);
+				fuwei();
+				vision_at('6', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				car(0,-90,0);
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 3: recover tray 1, then rings 1/2 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(1,500,3700*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(2,500,1850*4,2);
+				fnwuliao3();
+			}
+		}
+		
+		if (saoma_data[5] == '3'){
+			car(2,500,1850*4);
+				fuwei();
+			vision_at('6', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '1'){
+				car(1,500,3700*4);
+				fuwei();
+				vision_at('4', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				car(0,-90,0);
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 1: recover tray 1, then rings 3/2 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(2,500,3700*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(1,500,1850*4,2);
+				fnwuliao3();
+			}
+		}
+	}
+	
+	
+	if (saoma_data[6] == '3'){
+		car(2,500,1850*4);
+		fuwei();
+		vision_at('6', ring_center_x, ring_center_y);
+		fwuliao1();
+		
+		if (saoma_data[5] == '2'){
+			car(1,500,1850*4);
+				fuwei();
+			vision_at('5', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '1'){
+				car(1,500,1850*4);
+				fuwei();
+				vision_at('4', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				car(0,-90,0);
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 1: recover tray 1, then rings 2/3 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(2,500,1850*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(2,500,1850*4,2);
+				fnwuliao3();
+			}
+		}
+		
+		if (saoma_data[5] == '1'){
+			car(1,500,3700*4);
+				fuwei();
+			vision_at('4', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '2'){
+				car(2,500,1850*4);
+				fuwei();
+				vision_at('5', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				car(0,-90,0);
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 2: recover tray 1, then rings 1/3 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(1,500,1850*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(2,500,3700*4,2);
+				fnwuliao3();
+			}
+		}
+	}
+	
+	
+	
+	
 }
