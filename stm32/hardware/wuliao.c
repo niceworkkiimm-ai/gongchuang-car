@@ -23,14 +23,14 @@
 extern __IO uint8_t rxCmd[FIFO_SIZE];
 
 
-int zhua1=305;
-int zhua2=-20;
+int zhua1=309;
+int zhua2=-16;
 int zhua3=17;
 int fang1=308;
 int fang3=17;
 int fang2=-20;
 
-int zhua=165;
+int zhua=167;
 int fang=150;
 int guiwei=162;
 
