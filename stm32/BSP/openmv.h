@@ -18,6 +18,11 @@ float calc_speed(float error, float Kp, float max_speed);
 #define WL_WHEEL_DONE 2U
 /* Total positioning window after the first recognized target, not per axis. */
 #define WL_ALIGN_DELAY_MS 2000U
+/* First raw-material target: both times are measured from recognition start.
+ * A valid frame at/before EARLY_WINDOW latches a skip; accept a new valid
+ * frame at/after RETRY_AFTER. No early frame means normal immediate entry. */
+#define WL_FIRST_EARLY_WINDOW_MS 2000UL
+#define WL_FIRST_RETRY_AFTER_MS  4000UL
 extern volatile uint8_t wl_wheel_wait_state;
 extern volatile char wl_wheel_wait_axis;
 

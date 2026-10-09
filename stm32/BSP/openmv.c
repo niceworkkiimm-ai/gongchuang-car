@@ -445,6 +445,38 @@ static uint8_t wl_align_started = 0;
 static uint32_t wl_align_start_cycles = 0;
 static uint32_t wl_align_budget_cycles = 0;
 
+/* Poll only newly received, valid target frames. Waiting here does not use
+ * the existing positioning budget, which starts only after this gate opens. */
+static uint8_t WL_FirstTargetReady(uint32_t start_ms, uint32_t *seen_frames,
+                                   uint8_t *skip_early)
+{
+    uint32_t irq_mask, frames, frame_ms, now_ms, frame_elapsed;
+    uint8_t found;
+    int image_x, image_y;
+    irq_mask = __get_PRIMASK();
+    __disable_irq();
+    frames = camera_debug_frames;
+    frame_ms = camera_debug_last_frame_ms;
+    found = maixcam_found;
+    image_x = x;
+    image_y = y;
+    __set_PRIMASK(irq_mask);
+    if (frames == *seen_frames) return 0;
+    *seen_frames = frames;
+    now_ms = CameraDebug_NowMs();
+    frame_elapsed = (uint32_t)(frame_ms - start_ms);
+    if (!found || image_x <= 0 || image_x >= 320 ||
+        image_y <= 0 || image_y >= 240 ||
+        (uint32_t)(now_ms - frame_ms) >= VISION_FRAME_STALE_MS ||
+        frame_elapsed > (uint32_t)(now_ms - start_ms))
+        return 0;
+    if (frame_elapsed <= WL_FIRST_EARLY_WINDOW_MS)
+        *skip_early = 1;
+    if (*skip_early && frame_elapsed < WL_FIRST_RETRY_AFTER_MS)
+        return 0;
+    return 1;
+}
+
 static void WL_StartDeadline(void)
 {
     if (wl_align_started) return;
@@ -565,13 +597,13 @@ static void WL_MoveWheels(char axis, uint32_t pulses,
 
 void WL_dingwei(char WL){
         int align_error_x, align_error_y, align_image_y;
+        uint32_t first_start_ms, first_seen_frames, first_irq_mask;
+        uint8_t first_skip_early = 0;
         wl_align_started = 0;
         WheelReply_End();
         wl_wheel_wait_state = WL_WHEEL_IDLE;
         wl_wheel_wait_axis = '-';
         scanner_stage = 4;
-        Usart_SendByte4(UART4,WL);
-        scanner_stage = 5;
 
 	rxCmd[1] = 0x00;
 	rxCmd[2] = 0x00;
@@ -601,10 +633,17 @@ void WL_dingwei(char WL){
 	int error_y2=0;
 	int error_flag=0;
 		
+        /* The caller has completed servo preparation. Ignore cached frames
+         * from the previous mode, then start this visit's recognition clock. */
+        first_irq_mask = __get_PRIMASK();
+        __disable_irq();
+        first_seen_frames = camera_debug_frames;
+        first_start_ms = CameraDebug_NowMs();
+        __set_PRIMASK(first_irq_mask);
+        Usart_SendByte4(UART4,WL);
+        scanner_stage = 5;
 	WL_AlignDelay(20);
 	while(flag_n<2){
-			x = 0;
-			y = 0;
 			error_flag = 0;
 	
 	while(1){
@@ -612,13 +651,11 @@ void WL_dingwei(char WL){
 //		pos_x=abs((int)round(error_x*0.5625*13.3333));
 //		pos_y=abs((int)round(error_x*0.5625*13.3333));
 		WL_AlignDelay(1); // Refresh diagnostics even before a target is found.
-		if (!maixcam_found || x == 0 || y == 0){
-			x = 0;
-			y = 0;
-		}
-		else
+		if (!WL_FirstTargetReady(first_start_ms, &first_seen_frames,
+                                    &first_skip_early))
+            continue;
 		{
-            WL_StartDeadline(); /* First recognized target starts the timer. */
+            WL_StartDeadline(); /* Only an accepted target starts positioning. */
 			
 				
 			while(1){
