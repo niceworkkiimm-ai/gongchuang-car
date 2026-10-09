@@ -1572,7 +1572,7 @@ void ceshi6(void)
 				vision_at('6', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				car(0,-90,0);
+
 				delay_ms(100);
 			//**************×¥ÎïÁÏ**************	
 				/* Already at ring 3: recover tray 1, then rings 2/1 for trays 2/3. */
