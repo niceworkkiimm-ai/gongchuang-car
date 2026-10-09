@@ -1523,3 +1523,20 @@ void yuanhuanceshi(void )
 
 
 
+
+/* Simulated scan and camera ring-mode command only; no mechanical actions. */
+void ceshi6(void)
+{
+    const char simulated_scan[] = "123+321";
+    uint32_t irq_mask;
+    unsigned int i;
+
+    irq_mask = __get_PRIMASK();
+    __disable_irq();
+    for (i = 0; i < sizeof(simulated_scan); ++i)
+        saoma_data[i] = (uint8_t)simulated_scan[i];
+    saoma_ready = 1;
+    __set_PRIMASK(irq_mask);
+
+    Usart_SendByte4(UART4, 0x07); /* Raw numeric ring-recognition mode. */
+}
