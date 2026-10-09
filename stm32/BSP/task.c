@@ -8,7 +8,7 @@
 #include "uart_4.h"
 #include "uart_3.h"
 int speed_hua2=500;
-int speed_hua_jia2=500;
+int speed_hua_jia2=200;
 int speed=500;
 extern float anglea;
 
@@ -35,13 +35,13 @@ void zancun_na(dir,speed,location,WL){
 		
 		delay_ms(200);
 		
-		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 1800*4, 0, 0);    //升降台下降
+		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 4550, 0, 0);    //升降台下降
 		
 	delay_ms(650);
 	
 		jiazi(fang);     //将物料2放进托盘
 		
-		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 1800*4, 0, 0);      //升降台上升
+		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 4550, 0, 0);      //升降台上升
 	
 	delay_ms(250);
 		
@@ -78,13 +78,13 @@ void zancun_na(dir,speed,location,WL){
 		else if (WL == 2)
 			zhou(zhua2);
 		
-		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 1800*4, 0, 0);    //升降台下降
+		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 13310, 0, 0);    //升降台下降
 		
 	delay_ms(650);
 	
 		jiazi(fang);     //将物料2放进托盘
 		
-		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 1800*4, 0, 0);      //升降台上升
+		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 13310, 0, 0);      //升降台上升
 	
 	delay_ms(250);
 		
@@ -402,11 +402,11 @@ void cujiagong()
 	
 	car(5,speed,4450*4);
 	delay_ms(400);
+	
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
-	delay_ms(200);
 	
 	car(1,speed,11500*8);
 	delay_ms(1000);
@@ -419,11 +419,9 @@ void cujiagong()
 	
 	car(5,speed,4450*4);
 	delay_ms(200);
-	car(0,-90,0);
-	delay_ms(100);
 	
 	zhou(guiwei);   
-	Emm_V5_Pos_Control(5, 1, 500, 200, 8000, 0, 0);    //升降台降	
+	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降	
 	delay_ms(650);
 
 	
@@ -449,13 +447,11 @@ void cujiagong()
 				vision_at('6', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
+				car(0,-90,0);
 				delay_ms(100);
 			//**************抓物料**************	
 				car(1,500,3700*4);
+				delay_ms(200);
 				fnwuliao1();
 				zancun_na(2,500,1850*4,1);
 				fnwuliao2();
@@ -475,13 +471,11 @@ void cujiagong()
 				vision_at('5', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
+				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				car(1,500,1850*4);
+				delay_ms(200);
 				fnwuliao1();
 				zancun_na(2,500,3700*4,1);
 				fnwuliao2();
@@ -509,13 +503,11 @@ void cujiagong()
 				vision_at('6', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
+				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				car(1,500,1850*4);
+				delay_ms(200);
 				fnwuliao1();
 				zancun_na(1,500,1850*4,1);
 				fnwuliao2();
@@ -535,13 +527,11 @@ void cujiagong()
 				vision_at('4', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
+				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				car(2,500,1850*4);
+				delay_ms(200);
 				fnwuliao1();
 				zancun_na(2,500,1850*4,1);
 				fnwuliao2();
@@ -569,13 +559,11 @@ void cujiagong()
 				vision_at('4', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
+				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				car(2,500,3700*4);
+				delay_ms(200);
 				fnwuliao1();
 				zancun_na(1,500,1850*4,1);
 				fnwuliao2();
@@ -595,13 +583,11 @@ void cujiagong()
 				vision_at('5', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
+				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				car(2,500,1850*4);
+				delay_ms(200);
 				fnwuliao1();
 				zancun_na(1,500,3700*4,1);
 				fnwuliao2();
