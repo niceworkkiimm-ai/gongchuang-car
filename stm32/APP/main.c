@@ -58,8 +58,31 @@ int main(void)
 	Usart_Init2();
 	SysTick_Init();
 	Scanner_DisplayInit();
-#if RED_ALIGN_TEST_ENABLE
-	RedAlignTest_Run();
+#if 0   // 1:????????;0:??????
+
+    FSUS_ServoAngleReset(&usart2, 0); // ????????????
+    delay_ms(2000);                  // ????2?
+
+    // ?????
+    car(1, 500, 3700 * 4);
+    delay_ms(200);
+
+    fnwuliao1();
+		 delay_ms(200);
+    zancun_na(2, 500, 1850 * 4, 1);
+
+    fnwuliao2();
+		delay_ms(200);
+    zancun_na(2, 500, 1850 * 4, 2);
+
+    fnwuliao3();
+
+    // ?????,??????????
+    while (1)
+    {
+        delay_ms(10);
+    }
+
 #endif
 
 

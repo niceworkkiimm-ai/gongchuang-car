@@ -78,13 +78,13 @@ void zancun_na(dir,speed,location,WL){
 		else if (WL == 2)
 			zhou(zhua2);
 		
-		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 13310, 0, 0);    //升降台下降
+		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 4550, 0, 0);    //升降台下降
 		
-	delay_ms(650);
+	 delay_ms(650);
 	
 		jiazi(fang);     //将物料2放进托盘
 		
-		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 13310, 0, 0);      //升降台上升
+		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 4550, 0, 0);      //升降台上升
 	
 	delay_ms(250);
 		
@@ -276,14 +276,14 @@ void yuanliao()
 	delay_ms(300);
 	car(0,0,0);
 	delay_ms(50);
-	car(2,speed,11000*4);	//走到扫码区
+	car(2,speed,12000*4);	//走到扫码区
 	car(0,0,0);
 	delay_ms(50);
 	car(6,speed,4450*4);	//原地转弯
 	delay_ms(400);
 	car(0,-90,0);			//
 	delay_ms(50);
-	car(2,speed,12000*4);	//走到中心
+	car(2,speed,11500*4);	//走到中心
 	delay_ms(100);
 	car(6,speed,4450*4);	//原地转弯
 	delay_ms(400);
@@ -292,7 +292,7 @@ void yuanliao()
 	else if( anglea>=-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(100);
-	car(2,speed,11500*4);
+	car(2,speed,11200*4);
 	delay_ms(50);
 	
 	car(6,speed,4450*4);
@@ -408,7 +408,7 @@ void cujiagong()
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	
-	car(1,speed,11500*8);
+	car(1,speed,11000*8);
 	delay_ms(1000);
 	
 	if (anglea<180 && anglea>=0)
@@ -453,8 +453,10 @@ void cujiagong()
 				car(1,500,3700*4);
 				delay_ms(200);
 				fnwuliao1();
+				delay_ms(100);
 				zancun_na(2,500,1850*4,1);
 				fnwuliao2();
+				delay_ms(200);
 				zancun_na(2,500,1850*4,2);
 				fnwuliao3();
 			}
@@ -477,8 +479,10 @@ void cujiagong()
 				car(1,500,1850*4);
 				delay_ms(200);
 				fnwuliao1();
+				delay_ms(100);
 				zancun_na(2,500,3700*4,1);
 				fnwuliao2();
+				delay_ms(200);
 				zancun_na(1,500,1850*4,2);
 				fnwuliao3();
 			}
@@ -509,8 +513,10 @@ void cujiagong()
 				car(1,500,1850*4);
 				delay_ms(200);
 				fnwuliao1();
+				delay_ms(100);
 				zancun_na(1,500,1850*4,1);
 				fnwuliao2();
+				delay_ms(200);
 				zancun_na(2,500,3700*4,2);
 				fnwuliao3();
 			}
@@ -533,8 +539,10 @@ void cujiagong()
 				car(2,500,1850*4);
 				delay_ms(200);
 				fnwuliao1();
+				delay_ms(100);
 				zancun_na(2,500,1850*4,1);
 				fnwuliao2();
+				delay_ms(200);
 				zancun_na(1,500,3900*4,2);
 				fnwuliao3();
 			}
@@ -565,8 +573,10 @@ void cujiagong()
 				car(2,500,3700*4);
 				delay_ms(200);
 				fnwuliao1();
+				delay_ms(100);
 				zancun_na(1,500,1850*4,1);
 				fnwuliao2();
+				delay_ms(200);
 				zancun_na(1,500,1850*4,2);
 				fnwuliao3();
 			}
@@ -589,8 +599,10 @@ void cujiagong()
 				car(2,500,1850*4);
 				delay_ms(200);
 				fnwuliao1();
+				delay_ms(100);
 				zancun_na(1,500,3700*4,1);
 				fnwuliao2();
+				delay_ms(200);
 				zancun_na(2,500,1850*4,2);
 				fnwuliao3();
 			}
@@ -608,7 +620,7 @@ void zancunqu()
 	delay_ms(400);
 	car(0,-90,0);
 	delay_ms(50);
-	car(2,speed,10500*4);
+	car(2,speed,9000*4);
 	delay_ms(50);
 	car(6,speed,4450*4);
 	delay_ms(400);
@@ -620,9 +632,7 @@ void zancunqu()
 	car(2,speed,11000*4);
 	delay_ms(100);
 	zhou(guiwei);    //夹子正对物料
-	delay_ms(100);
-	Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 6200*4, 0, 0);    //升降台降
-
+	
 		//***********放物料*************
 	if (saoma_data[0] == '1'){
 		car(1,500,1850*4);
