@@ -2,6 +2,7 @@
 
 import argparse
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 
@@ -36,6 +37,11 @@ static void vision(char mode)
 {
     if (phase == 0) assert(mode == '3' + current_ring);
     else assert(mode == first_layer[current_ring] - '0');
+}
+static void vision_at(char mode, int center_x, int center_y)
+{
+    assert(center_x == 175 && center_y == 139);
+    vision(mode);
 }
 static void put_on_coarse_ring(int tray)
 {
@@ -169,9 +175,26 @@ def main():
     lookup = function(source, "static uint8_t first_round_color_for_ring(uint8_t ring)")
     coarse = actions(source, "void cujiagong2()")
     stack = actions(source, "void zancunqu2()")
+    first_actions = actions(source, "void cujiagong()")
+    for first_index, second_index in ((6, 14), (5, 13), (4, 12)):
+        first_actions = first_actions.replace(
+            f"saoma_data[{first_index}]", f"saoma_data[{second_index}]")
+    assert re.sub(r"\s+", "", first_actions) == re.sub(r"\s+", "", coarse)
+    first_coarse = function(source, "void cujiagong()")
+    second_coarse = function(source, "void cujiagong2()")
+    lift = "Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);"
+    assert lift in first_coarse and lift in second_coarse
+    assert second_coarse.index(lift) < second_coarse.index("delay_ms(650);")
+    assert "const int ring_center_x = 175;" in second_coarse
+    assert "const int ring_center_y = 139;" in second_coarse
+    assert "vision('4');" not in coarse
+    assert "vision('5');" not in coarse
+    assert "vision('6');" not in coarse
     code = HARNESS.replace("/* INSERT_COLOR_LOOKUP */", lookup)
     code = code.replace("/* INSERT_COARSE_ACTIONS */",
-                        "static void second_coarse_actions(void)\n{\n" + coarse + "\n}")
+                        "static void second_coarse_actions(void)\n{\n"
+                        "const int ring_center_x = 175, ring_center_y = 139;\n"
+                        + coarse + "\n}")
     code = code.replace("/* INSERT_STACK_ACTIONS */",
                         "static void second_stack_actions(void)\n{\n" + stack + "\n}")
     with tempfile.TemporaryDirectory(prefix="four-group-task-") as directory:

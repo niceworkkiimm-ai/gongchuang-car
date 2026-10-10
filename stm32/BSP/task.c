@@ -311,7 +311,7 @@ void yuanliao()
 	else if( anglea>=-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(100);
-	car(2,speed,11200*4);
+	car(2,speed,12000*4);
 	delay_ms(50);
 	
 	car(6,speed,4450*4);
@@ -577,7 +577,7 @@ void zancunqu()
 	delay_ms(400);
 	car(0,-90,0);
 	delay_ms(50);
-	car(2,speed,10000*4);
+	car(2,speed,11500*4);
 	delay_ms(50);
 	car(6,speed,4450*4);
 	delay_ms(400);
@@ -757,13 +757,16 @@ void yuanliao2()
 
 void cujiagong2()
 {
+    const int ring_center_x = 175;
+    const int ring_center_y = 139;
 	/* Wang Kai route: inter-station travel. */
 	car(6,speed,4500*4);
 	delay_ms(300);
 	car(2,speed,22500*4);
 	delay_ms(50);
 	zhou(guiwei);    //夹子正对物料
-	Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 6200*4, 0, 0);    //升降台降
+	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降
+	delay_ms(650);
 	car(6,speed,4450*4);
 
 	//***********放物料*************
@@ -771,19 +774,19 @@ void cujiagong2()
 	if (saoma_data[14] == '1'){
 		car(1,500,1850*4);
 			fuwei();		//识别并且调整
-		vision('4');
+		vision_at('4', ring_center_x, ring_center_y);
 		fwuliao1();
 		
 		if (saoma_data[13] == '2'){
 			car(2,500,1850*4);
 				fuwei();
-			vision('5');
+			vision_at('5', ring_center_x, ring_center_y);
 			fwuliao2();
 			
 			if (saoma_data[12]=='3'){
 				car(2,500,1850*4);
 				fuwei();
-				vision('6');
+				vision_at('6', ring_center_x, ring_center_y);
 				fwuliao3();
 				
 
@@ -805,12 +808,12 @@ void cujiagong2()
 		if (saoma_data[13] == '3'){
 			car(2,500,3700*4);
 				fuwei();
-			vision('6');
+			vision_at('6', ring_center_x, ring_center_y);
 			fwuliao2();
 			if (saoma_data[12] == '2'){
 				car(1,500,1850*4);
 				fuwei();
-				vision('5');
+				vision_at('5', ring_center_x, ring_center_y);
 				fwuliao3();
 				
 				delay_ms(100);
@@ -832,19 +835,19 @@ void cujiagong2()
 	
 	if (saoma_data[14] == '2'){
 			fuwei();
-		vision('5');
+		vision_at('5', ring_center_x, ring_center_y);
 		fwuliao1();
 		
 		if (saoma_data[13] == '1'){
 			car(1,500,1850*4);
 				fuwei();
-			vision('4');
+			vision_at('4', ring_center_x, ring_center_y);
 			fwuliao2();
 			if (saoma_data[12] == '3'){
 				
 				car(2,500,3700*4);
 				fuwei();
-				vision('6');
+				vision_at('6', ring_center_x, ring_center_y);
 				fwuliao3();
 				
 				delay_ms(100);
@@ -865,12 +868,12 @@ void cujiagong2()
 		if (saoma_data[13] == '3'){
 			car(2,500,1850*4);
 				fuwei();
-			vision('6');
+			vision_at('6', ring_center_x, ring_center_y);
 			fwuliao2();
 			if (saoma_data[12] == '1'){
 				car(1,500,3700*4);
 				fuwei();
-				vision('4');
+				vision_at('4', ring_center_x, ring_center_y);
 				fwuliao3();
 				
 				delay_ms(100);
@@ -893,18 +896,18 @@ void cujiagong2()
 	if (saoma_data[14] == '3'){
 		car(2,500,1850*4);
 		fuwei();
-		vision('6');
+		vision_at('6', ring_center_x, ring_center_y);
 		fwuliao1();
 		
 		if (saoma_data[13] == '2'){
 			car(1,500,1850*4);
 				fuwei();
-			vision('5');
+			vision_at('5', ring_center_x, ring_center_y);
 			fwuliao2();
 			if (saoma_data[12] == '1'){
 				car(1,500,1850*4);
 				fuwei();
-				vision('4');
+				vision_at('4', ring_center_x, ring_center_y);
 				fwuliao3();
 				
 				delay_ms(100);
@@ -925,12 +928,12 @@ void cujiagong2()
 		if (saoma_data[13] == '1'){
 			car(1,500,3700*4);
 				fuwei();
-			vision('4');
+			vision_at('4', ring_center_x, ring_center_y);
 			fwuliao2();
 			if (saoma_data[12] == '2'){
 				car(2,500,1850*4);
 				fuwei();
-				vision('5');
+				vision_at('5', ring_center_x, ring_center_y);
 				fwuliao3();
 				
 				delay_ms(100);
