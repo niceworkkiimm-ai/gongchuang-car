@@ -617,6 +617,10 @@ void cujiagong()
 
 void zancunqu()
 {
+    /* Same physical tray order as cujiagong: 3, 2, 1. */
+    const int ring_center_x = 175;
+    const int ring_center_y = 139;
+
 	/* Wang Kai route: inter-station travel. */
 	delay_ms(400);
 	car(0,-90,0);
@@ -634,113 +638,116 @@ void zancunqu()
 	delay_ms(100);
 	zhou(guiwei);    //夹子正对物料
 	
-		//***********放物料*************
-	if (saoma_data[0] == '1'){
+	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);
+	delay_ms(650);
+
+	/* Place tray 3 at scan[2], tray 2 at scan[1], tray 1 at scan[0]. */
+	//***********放物料*************
+	/* At the rings: car(1) moves toward ring 1; car(2) toward ring 3. */
+	if (saoma_data[2] == '1'){
 		car(1,500,1850*4);
-			fuwei();
-		vision('4');
+			fuwei();		//识别并且调整
+		vision_at('4', ring_center_x, ring_center_y);
 		fwuliao1();
 		
 		if (saoma_data[1] == '2'){
 			car(2,500,1850*4);
 				fuwei();
-			vision('5');
+			vision_at('5', ring_center_x, ring_center_y);
 			fwuliao2();
 			
-			if (saoma_data[2]=='3'){
+			if (saoma_data[0]=='3'){
 				car(2,500,1850*4);
 				fuwei();
-				vision('6');
+				vision_at('6', ring_center_x, ring_center_y);
 				fwuliao3();
-
 			}
 			}
 		
 		if (saoma_data[1] == '3'){
 			car(2,500,3700*4);
 				fuwei();
-			vision('6');
+			vision_at('6', ring_center_x, ring_center_y);
 			fwuliao2();
-			if (saoma_data[2] == '2'){
+			if (saoma_data[0] == '2'){
 				car(1,500,1850*4);
 				fuwei();
-				vision('5');
+				vision_at('5', ring_center_x, ring_center_y);
 				fwuliao3();
-				
 			}
 		}
 	}
 	
 	
-	if (saoma_data[0] == '2'){
-	fuwei();
-		vision('5');
+	if (saoma_data[2] == '2'){
+			fuwei();
+		vision_at('5', ring_center_x, ring_center_y);
 		fwuliao1();
 		
 		if (saoma_data[1] == '1'){
 			car(1,500,1850*4);
 				fuwei();
-			vision('4');
+			vision_at('4', ring_center_x, ring_center_y);
 			fwuliao2();
-			if (saoma_data[2] == '3'){
+			if (saoma_data[0] == '3'){
+				
 				car(2,500,3700*4);
 				fuwei();
-				vision('6');
+				vision_at('6', ring_center_x, ring_center_y);
 				fwuliao3();
-				
 			}
 		}
 		
 		if (saoma_data[1] == '3'){
 			car(2,500,1850*4);
 				fuwei();
-			vision('6');
+			vision_at('6', ring_center_x, ring_center_y);
 			fwuliao2();
-			if (saoma_data[2] == '1'){
+			if (saoma_data[0] == '1'){
 				car(1,500,3700*4);
 				fuwei();
-				vision('4');
+				vision_at('4', ring_center_x, ring_center_y);
 				fwuliao3();
-				
 			}
 		}
 	}
 	
 	
-	if (saoma_data[0] == '3'){
+	if (saoma_data[2] == '3'){
 		car(2,500,1850*4);
-			fuwei();
-		vision('6');
+		fuwei();
+		vision_at('6', ring_center_x, ring_center_y);
 		fwuliao1();
 		
 		if (saoma_data[1] == '2'){
 			car(1,500,1850*4);
 				fuwei();
-			vision('5');
+			vision_at('5', ring_center_x, ring_center_y);
 			fwuliao2();
-			if (saoma_data[2] == '1'){
+			if (saoma_data[0] == '1'){
 				car(1,500,1850*4);
 				fuwei();
-				vision('4');
+				vision_at('4', ring_center_x, ring_center_y);
 				fwuliao3();
-
 			}
 		}
 		
 		if (saoma_data[1] == '1'){
 			car(1,500,3700*4);
 				fuwei();
-			vision('4');
+			vision_at('4', ring_center_x, ring_center_y);
 			fwuliao2();
-			if (saoma_data[2] == '2'){
+			if (saoma_data[0] == '2'){
 				car(2,500,1850*4);
 				fuwei();
-				vision('5');
+				vision_at('5', ring_center_x, ring_center_y);
 				fwuliao3();
-				
 			}
 		}
 	}
+	
+	
+	
 	
 }
 
