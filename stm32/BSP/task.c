@@ -625,7 +625,7 @@ void zancunqu()
 	delay_ms(400);
 	car(0,-90,0);
 	delay_ms(50);
-	car(2,speed,9000*4);
+	car(2,speed,10000*4);
 	delay_ms(50);
 	car(6,speed,4450*4);
 	delay_ms(400);
@@ -794,14 +794,14 @@ void yuanliao2()
 	fuwei();
 	
 	Scanner_WaitForData(); // 行走中持续接收扫码，到此还未收到则等待
-	WL_dingwei(saoma_data[4]);
+	WL_dingwei(saoma_data[8]);
 	delay_ms(50);
 	wuliao1();
 	fuwei();
 	
 	zhuazikai();
 
-	if (saoma_data[5] == '1'){
+	if (saoma_data[9] == '1'){
 		Usart_SendByte4(UART4,'7');
 		while(1){
 			fuwei();
@@ -813,7 +813,7 @@ void yuanliao2()
 		}
 	}
 	}
-	else if (saoma_data[5] == '2'){
+	else if (saoma_data[9] == '2'){
 		Usart_SendByte4(UART4,'8');
 		while(1){
 			fuwei();
@@ -825,7 +825,7 @@ void yuanliao2()
 		}
 	}
 	}
-	else if (saoma_data[5] == '3'){
+	else if (saoma_data[9] == '3'){
 		Usart_SendByte4(UART4,'9');
 		while(1){
 						fuwei();
@@ -840,7 +840,7 @@ void yuanliao2()
 	
 	zhuazikai();
 	
-	if (saoma_data[6] == '1'){
+	if (saoma_data[10] == '1'){
 		Usart_SendByte4(UART4,'7');
 		while(1){
 			fuwei();
@@ -852,7 +852,7 @@ void yuanliao2()
 		}
 	}
 	}
-	else if (saoma_data[6] == '2'){
+	else if (saoma_data[10] == '2'){
 		Usart_SendByte4(UART4,'8');
 		while(1){
 			fuwei();
@@ -864,7 +864,7 @@ void yuanliao2()
 		}
 	}
 	}
-	else if (saoma_data[6] == '3'){
+	else if (saoma_data[10] == '3'){
 		Usart_SendByte4(UART4,'9');
 		while(1){
 			fuwei();
@@ -892,188 +892,202 @@ void cujiagong2()
 	car(6,speed,4450*4);
 
 	//***********放物料*************
-	/* Placement order: QR digit 4 -> 5 -> 6, excluding the '+' separator. */
-	if (saoma_data[4] == '1'){
+	/* At the rings: car(1) moves toward ring 1; car(2) toward ring 3. */
+	if (saoma_data[14] == '1'){
 		car(1,500,1850*4);
-			fuwei();
+			fuwei();		//识别并且调整
 		vision('4');
 		fwuliao1();
 		
-		if (saoma_data[5] == '2'){
+		if (saoma_data[13] == '2'){
 			car(2,500,1850*4);
 				fuwei();
 			vision('5');
 			fwuliao2();
 			
-			if (saoma_data[6]=='3'){
+			if (saoma_data[12]=='3'){
 				car(2,500,1850*4);
 				fuwei();
 				vision('6');
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
+
 				delay_ms(100);
 			//**************抓物料**************	
-				car(1,500,3700*4);
+				/* Already at ring 3: recover tray 1, then rings 2/1 for trays 2/3. */
+				delay_ms(200);
 				fnwuliao1();
-				zancun_na(2,500,1850*4,1);
+				delay_ms(100);
+				zancun_na(1,500,1850*4,1);
 				fnwuliao2();
-				zancun_na(2,500,1850*4,2);
+				delay_ms(200);
+				zancun_na(1,500,1850*4,2);
 				fnwuliao3();
+				car(2,500,1850*4); /* From ring 1 back to center ring 2. */
 			}
 			}
 		
-		if (saoma_data[5] == '3'){
+		if (saoma_data[13] == '3'){
 			car(2,500,3700*4);
 				fuwei();
 			vision('6');
 			fwuliao2();
-			if (saoma_data[6] == '2'){
+			if (saoma_data[12] == '2'){
 				car(1,500,1850*4);
 				fuwei();
 				vision('5');
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
 				delay_ms(100);
 				//**************抓物料**************	
-				car(1,500,1850*4);
+				/* Already at ring 2: recover tray 1, then rings 3/1 for trays 2/3. */
+				delay_ms(200);
 				fnwuliao1();
-				zancun_na(2,500,3700*4,1);
+				delay_ms(100);
+				zancun_na(2,500,1850*4,1);
 				fnwuliao2();
-				zancun_na(1,500,1850*4,2);
+				delay_ms(200);
+				zancun_na(1,500,3700*4,2);
 				fnwuliao3();
+				car(2,500,1850*4); /* From ring 1 back to center ring 2. */
 			}
 		}
 	}
 	
 	
-	if (saoma_data[4] == '2'){
-	fuwei();
+	if (saoma_data[14] == '2'){
+			fuwei();
 		vision('5');
 		fwuliao1();
 		
-		if (saoma_data[5] == '1'){
+		if (saoma_data[13] == '1'){
 			car(1,500,1850*4);
 				fuwei();
 			vision('4');
 			fwuliao2();
-			if (saoma_data[6] == '3'){
+			if (saoma_data[12] == '3'){
+				
 				car(2,500,3700*4);
 				fuwei();
 				vision('6');
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
 				delay_ms(100);
 				//**************抓物料**************	
-				car(1,500,1850*4);
+				/* Already at ring 3: recover tray 1, then rings 1/2 for trays 2/3. */
+				delay_ms(200);
 				fnwuliao1();
-				zancun_na(1,500,1850*4,1);
+				delay_ms(100);
+				zancun_na(1,500,3700*4,1);
 				fnwuliao2();
-				zancun_na(2,500,3700*4,2);
+				delay_ms(200);
+				zancun_na(2,500,1850*4,2);
 				fnwuliao3();
+				/* At center ring 2; ready for the next task. */
 			}
 		}
 		
-		if (saoma_data[5] == '3'){
+		if (saoma_data[13] == '3'){
 			car(2,500,1850*4);
 				fuwei();
 			vision('6');
 			fwuliao2();
-			if (saoma_data[6] == '1'){
+			if (saoma_data[12] == '1'){
 				car(1,500,3700*4);
 				fuwei();
 				vision('4');
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
 				delay_ms(100);
 				//**************抓物料**************	
-				car(2,500,1850*4);
+				/* Already at ring 1: recover tray 1, then rings 3/2 for trays 2/3. */
+				delay_ms(200);
 				fnwuliao1();
-				zancun_na(2,500,1850*4,1);
+				delay_ms(100);
+				zancun_na(2,500,3700*4,1);
 				fnwuliao2();
-				zancun_na(1,500,3900*4,2);
+				delay_ms(200);
+				zancun_na(1,500,1850*4,2);
 				fnwuliao3();
+				/* At center ring 2; ready for the next task. */
 			}
 		}
 	}
 	
 	
-	if (saoma_data[4] == '3'){
+	if (saoma_data[14] == '3'){
 		car(2,500,1850*4);
+		fuwei();
 		vision('6');
 		fwuliao1();
 		
-		if (saoma_data[5] == '2'){
+		if (saoma_data[13] == '2'){
 			car(1,500,1850*4);
 				fuwei();
 			vision('5');
 			fwuliao2();
-			if (saoma_data[6] == '1'){
+			if (saoma_data[12] == '1'){
 				car(1,500,1850*4);
 				fuwei();
 				vision('4');
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
 				delay_ms(100);
 				//**************抓物料**************	
-				car(2,500,3700*4);
+				/* Already at ring 1: recover tray 1, then rings 2/3 for trays 2/3. */
+				delay_ms(200);
 				fnwuliao1();
-				zancun_na(1,500,1850*4,1);
+				delay_ms(100);
+				zancun_na(2,500,1850*4,1);
 				fnwuliao2();
-				zancun_na(1,500,1850*4,2);
+				delay_ms(200);
+				zancun_na(2,500,1850*4,2);
 				fnwuliao3();
+				car(1,500,1850*4); /* From ring 3 back to center ring 2. */
 			}
 		}
 		
-		if (saoma_data[5] == '1'){
+		if (saoma_data[13] == '1'){
 			car(1,500,3700*4);
 				fuwei();
 			vision('4');
 			fwuliao2();
-			if (saoma_data[6] == '2'){
+			if (saoma_data[12] == '2'){
 				car(2,500,1850*4);
 				fuwei();
 				vision('5');
 				fwuliao3();
 				
-				if (anglea<180 && anglea>=0)
-					car(0,180,0);
-				else if( anglea>-180 && anglea <=0)
-					car(0,-180,0);
 				delay_ms(100);
 				//**************抓物料**************	
-				car(2,500,1850*4);
+				/* Already at ring 2: recover tray 1, then rings 1/3 for trays 2/3. */
+				delay_ms(200);
 				fnwuliao1();
-				zancun_na(1,500,3700*4,1);
+				delay_ms(100);
+				zancun_na(1,500,1850*4,1);
 				fnwuliao2();
-				zancun_na(2,500,1850*4,2);
+				delay_ms(200);
+				zancun_na(2,500,3700*4,2);
 				fnwuliao3();
+				car(1,500,1850*4); /* From ring 3 back to center ring 2. */
 			}
 		}
 	}
 	
 	
+	
+	
 }
 
+
+/* Find the first-layer material color at a temporary-zone ring. */
+static uint8_t first_round_color_for_ring(uint8_t ring)
+{
+    uint8_t i;
+    for (i = 0; i < 3; ++i)
+        if (saoma_data[4 + i] == ring) return saoma_data[i];
+    return '0'; /* A validated ring permutation should never reach this. */
+}
 
 void zancunqu2()
 {
@@ -1096,36 +1110,36 @@ void zancunqu2()
 
 		//***********放物料*************
 	/* Placement order: QR digit 4 -> 5 -> 6, excluding the '+' separator. */
-	if (saoma_data[4] == '1'){
+	if (saoma_data[12] == '1'){
 		car(1,500,1850*4);
 			fuwei();
-		vision('1');
+		vision(first_round_color_for_ring('1'));
 		maduo1();
 		
-		if (saoma_data[5] == '2'){
+		if (saoma_data[13] == '2'){
 			car(2,500,1850*4);
 				fuwei();
-			vision('2');
+			vision(first_round_color_for_ring('2'));
 			maduo2();
 			
-			if (saoma_data[6]=='3'){
+			if (saoma_data[14]=='3'){
 				car(2,500,1850*4);
 					fuwei();
-				vision('3');
+				vision(first_round_color_for_ring('3'));
 				maduo_z(fang3);
 
 			}
 			}
 		
-		if (saoma_data[5] == '3'){
+		if (saoma_data[13] == '3'){
 			car(2,500,3700*4);
 				fuwei();
-			vision('3');
+			vision(first_round_color_for_ring('3'));
 			maduo2();
-			if (saoma_data[6] == '2'){
+			if (saoma_data[14] == '2'){
 				car(1,500,1850*4);
 					fuwei();
-				vision('2');
+				vision(first_round_color_for_ring('2'));
 				maduo_z(fang3);
 				
 			}
@@ -1133,34 +1147,34 @@ void zancunqu2()
 	}
 	
 	
-	if (saoma_data[4] == '2'){
+	if (saoma_data[12] == '2'){
 	fuwei();
-		vision('2');
+		vision(first_round_color_for_ring('2'));
 		maduo1();
 		
-		if (saoma_data[5] == '1'){
+		if (saoma_data[13] == '1'){
 			car(1,500,1850*4);
 				fuwei();
-			vision('1');
+			vision(first_round_color_for_ring('1'));
 			maduo_z(fang2);
-			if (saoma_data[6] == '3'){
+			if (saoma_data[14] == '3'){
 				car(2,500,3700*4);
 					fuwei();
-				vision('3');
+				vision(first_round_color_for_ring('3'));
 				maduo_z(fang3);
 				
 			}
 		}
 		
-		if (saoma_data[5] == '3'){
+		if (saoma_data[13] == '3'){
 			car(2,500,1850*4);
 				fuwei();
-			vision('3');
+			vision(first_round_color_for_ring('3'));
 			maduo2();
-			if (saoma_data[6] == '1'){
+			if (saoma_data[14] == '1'){
 				car(1,500,3700*4);
 					fuwei();
-				vision('1');
+				vision(first_round_color_for_ring('1'));
 				maduo3();
 				
 			}
@@ -1168,35 +1182,35 @@ void zancunqu2()
 	}
 	
 	
-	if (saoma_data[4] == '3'){
+	if (saoma_data[12] == '3'){
 		car(2,500,1850*4);
 			fuwei();
-		vision('3');
+		vision(first_round_color_for_ring('3'));
 		maduo1();
 		
-		if (saoma_data[5] == '2'){
+		if (saoma_data[13] == '2'){
 			car(1,500,1850*4);
 				fuwei();
-			vision('2');
+			vision(first_round_color_for_ring('2'));
 			maduo_z(fang2);
-			if (saoma_data[6] == '1'){
+			if (saoma_data[14] == '1'){
 				car(1,500,1850*4);
 					fuwei();
-				vision('1');
+				vision(first_round_color_for_ring('1'));
 				maduo3();
 
 			}
 		}
 		
-		if (saoma_data[5] == '1'){
+		if (saoma_data[13] == '1'){
 			car(1,500,3700*4);
 				fuwei();
-			vision('1');
+			vision(first_round_color_for_ring('1'));
 			maduo2();
-			if (saoma_data[6] == '2'){
+			if (saoma_data[14] == '2'){
 				car(2,500,1850*4);
 					fuwei();
-				vision('2');
+				vision(first_round_color_for_ring('2'));
 				maduo_z(fang3);
 				
 			}
@@ -1208,15 +1222,15 @@ void zancunqu2()
 void qidian()
 {
 	/* Wang Kai route: inter-station travel. */
-	if (saoma_data[6] == '1'){
+	if (saoma_data[14] == '1'){
 		delay_ms(350);
 		zhou(fang1);
 	}
-	else if (saoma_data[6] == '2'){
+	else if (saoma_data[14] == '2'){
 		delay_ms(350);
 		zhou(fang1);
 	}
-	else if (saoma_data[6] == '3'){
+	else if (saoma_data[14] == '3'){
 		delay_ms(350);
 		zhou(fang1);
 	}

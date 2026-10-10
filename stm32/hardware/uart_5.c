@@ -28,14 +28,14 @@ volatile uint32_t scanner_last_error = 0;
 volatile uint8_t scanner_raw_tail[8];
 volatile uint32_t scanner_poll_rx_count = 0;
 volatile uint8_t scanner_pd2_level = 1;
-static uint8_t scan_window[7];
+static uint8_t scan_window[15];
 static uint8_t scan_count = 0;
 uint8_t saoma_data[1000];
 
 /* UART5 RX receives scans; UART5 TX updates the HMI without blocking RX.
  * RX and polling serialize queue access; the active TX frame stays private.
  */
-#define HMI_SCAN_LENGTH 7U
+#define HMI_SCAN_LENGTH 15U
 #define HMI_COMMAND_PREFIX "page0.t0.txt=\""
 #define HMI_FRAME_LENGTH ((sizeof(HMI_COMMAND_PREFIX) - 1U) + HMI_SCAN_LENGTH + 4U)
 static volatile uint8_t hmi_pending_scan[HMI_SCAN_LENGTH];
@@ -244,10 +244,10 @@ void UsartPrintf5(USART_TypeDef *USARTx, char *fmt, ...)
 }
 
 
-/* 原始扫码内容格式为 123+321；接受 CR、CRLF、DT 或无后缀。
- * 使用固定长度窗口寻找有效内容，不把模块应答和前后缀当作物料编号。
- * 串口屏显示最新扫码：前三位支持1~6，后三位支持1~3。
- * 运动任务只使用颜色编号1~3，仍锁定本次上电的第一组有效数据。
+/* Four-group scan: color1+ring1+color2+ring2, e.g. 123+321+132+213.
+ * HMI displays valid frames with colors 1..6 and rings 1..3.
+ * Motion currently locks only four 1..3 permutations, matching the
+ * implemented three-color pickup and ring-placement routines.
  */
 static void Scanner_ReceiveByte(uint8_t data)
 {
@@ -261,21 +261,30 @@ static void Scanner_ReceiveByte(uint8_t data)
     }
     scan_window[scan_count++] = data;
     if (scan_count != sizeof(scan_window)) return;
-    if (scan_window[3] != '+') return;
+    if (scan_window[3] != '+' || scan_window[7] != '+' ||
+        scan_window[11] != '+') return;
     for (i = 0; i < sizeof(scan_window); ++i)
     {
-        if (i == 3) continue;
+        if (i == 3 || i == 7 || i == 11) continue;
         if (scan_window[i] < '1') return;
-        if (scan_window[i] > ((i < 3) ? '6' : '3')) return;
+        if (scan_window[i] > (((i < 3) || (i >= 8 && i < 11)) ? '6' : '3')) return;
     }
 
     HMI_QueueScan(scan_window);
     if (saoma_ready) return;
+    /* Current motion routines support colors 1..3 and one item per ring. */
     for (i = 0; i < 3; ++i)
-        if (scan_window[i] > '3') return;
+        if (scan_window[i] > '3' || scan_window[8 + i] > '3') return;
+    for (i = 0; i < 4; ++i)
+    {
+        uint8_t base = (uint8_t)(4U * i);
+        if (scan_window[base] == scan_window[base + 1] ||
+            scan_window[base] == scan_window[base + 2] ||
+            scan_window[base + 1] == scan_window[base + 2]) return;
+    }
 
     memcpy(saoma_data, scan_window, sizeof(scan_window));
-    saoma_data[7] = '\0';
+    saoma_data[sizeof(scan_window)] = '\0';
     saoma_ready = 1;
 }
 
