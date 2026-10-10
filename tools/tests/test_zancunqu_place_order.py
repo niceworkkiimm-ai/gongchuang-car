@@ -1,8 +1,8 @@
 """Run the real temporary-zone placement branches with mocked hardware."""
 
 import argparse
-import itertools
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 
@@ -45,23 +45,27 @@ static void fwuliao3(void) { place(1); }
 int main(void)
 {
     const char *cases[] = {"123", "132", "213", "231", "312", "321"};
-    int i, j;
+    int i, j, k;
     for (i = 0; i < 6; ++i) {
-        memset(saoma_data, 0, sizeof(saoma_data));
-        memcpy(saoma_data, cases[i], 3);
-        memset(trays, 0, sizeof(trays));
-        memset(rings, 0, sizeof(rings));
-        current_ring = 2; count = 0;
-        for (j = 1; j <= 3; ++j) trays[j] = cases[i][j - 1] - '0';
-        place_at_temporary_zone();
-        assert(count == 3 && current_ring == cases[i][0] - '0');
-        for (j = 1; j <= 3; ++j) {
-            assert(trays[j] == 0);
-            assert(rings[j] == j);
-            assert(placement[j - 1] == cases[i][3 - j] - '0');
+        for (k = 0; k < 6; ++k) {
+            memset(saoma_data, 0, sizeof(saoma_data));
+            memcpy(saoma_data, cases[i], 3);
+            saoma_data[3] = '+';
+            memcpy(saoma_data + 4, cases[k], 3);
+            memset(trays, 0, sizeof(trays));
+            memset(rings, 0, sizeof(rings));
+            current_ring = 2; count = 0;
+            for (j = 1; j <= 3; ++j) trays[j] = cases[i][j - 1] - '0';
+            place_at_temporary_zone();
+            assert(count == 3 && current_ring == cases[k][0] - '0');
+            for (j = 0; j < 3; ++j) {
+                assert(trays[j + 1] == 0);
+                assert(rings[cases[k][j] - '0'] == cases[i][j] - '0');
+                assert(placement[j] == cases[k][2 - j] - '0');
+            }
         }
     }
-    puts("PASS: all six temporary-zone placements use the matching tray/ring and leave materials there.");
+    puts("PASS: all 36 scan combinations place trays 3/2/1 at scan[6]/[5]/[4] and leave materials there.");
     return 0;
 }
 '''
@@ -87,7 +91,17 @@ def main():
     function = source[start:end]
     marker = "//***********放物料*************"
     action = function[function.index(marker):function.rindex("\n}")]
+    coarse_start = source.index("void cujiagong()")
+    coarse = source[coarse_start:start]
+    coarse_action = coarse[coarse.index(marker):coarse.rindex("\n}")]
+    coarse_placement, removed = re.subn(
+        r"(?m)(\t{4}fwuliao3\(\);)[\s\S]*?(?=^\t{3}\})",
+        r"\1\n", coarse_action)
+    assert removed == 6
+    assert re.sub(r"\s+", "", action) == re.sub(r"\s+", "", coarse_placement)
     assert "fnwuliao" not in action and "zancun_na" not in action
+    assert "saoma_data[0]" not in action and "saoma_data[1]" not in action
+    assert "saoma_data[2]" not in action
     assert action.count("fwuliao1();") == 3
     assert action.count("fwuliao2();") == 6
     assert action.count("fwuliao3();") == 6
