@@ -35,7 +35,7 @@ static void car(int mode, int rpm, int pulses)
 static void vision(char mode)
 {
     if (phase == 0) assert(mode == '3' + current_ring);
-    else assert(mode == first_layer[current_ring]);
+    else assert(mode == first_layer[current_ring] - '0');
 }
 static void put_on_coarse_ring(int tray)
 {
@@ -128,13 +128,14 @@ static void run_case(const char *first_colors, const char *first_rings,
 int main(void)
 {
     const char *cases[] = {"123", "132", "213", "231", "312", "321"};
+    const char *colors[] = {"123", "156", "516", "456", "654", "246"};
     int a, b, c, d;
     for (a = 0; a < 6; ++a)
         for (b = 0; b < 6; ++b)
             for (c = 0; c < 6; ++c)
                 for (d = 0; d < 6; ++d)
-                    run_case(cases[a], cases[b], cases[c], cases[d]);
-    puts("PASS: all 1296 four-group combinations preserve tray mapping and stack at group-4 rings.");
+                    run_case(colors[a], cases[b], colors[c], cases[d]);
+    puts("PASS: 1296 four-group combinations, including colors 1..6, preserve tray mapping and stack at group-4 rings.");
     return 0;
 }
 '''

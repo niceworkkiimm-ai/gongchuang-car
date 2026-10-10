@@ -246,8 +246,8 @@ void UsartPrintf5(USART_TypeDef *USARTx, char *fmt, ...)
 
 /* Four-group scan: color1+ring1+color2+ring2, e.g. 123+321+132+213.
  * HMI displays valid frames with colors 1..6 and rings 1..3.
- * Motion currently locks only four 1..3 permutations, matching the
- * implemented three-color pickup and ring-placement routines.
+ * Each color group has three distinct colors 1..6; each ring group is a
+ * permutation of 1..3 so every ring receives exactly one material.
  */
 static void Scanner_ReceiveByte(uint8_t data)
 {
@@ -272,9 +272,6 @@ static void Scanner_ReceiveByte(uint8_t data)
 
     HMI_QueueScan(scan_window);
     if (saoma_ready) return;
-    /* Current motion routines support colors 1..3 and one item per ring. */
-    for (i = 0; i < 3; ++i)
-        if (scan_window[i] > '3' || scan_window[8 + i] > '3') return;
     for (i = 0; i < 4; ++i)
     {
         uint8_t base = (uint8_t)(4U * i);

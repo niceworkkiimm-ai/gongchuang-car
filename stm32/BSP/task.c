@@ -7,6 +7,7 @@
 #include "uart_5.h"
 #include "uart_4.h"
 #include "uart_3.h"
+#include "camera_debug.h"
 int speed_hua2=500;
 int speed_hua_jia2=200;
 int speed=500;
@@ -269,6 +270,24 @@ void ceshi3()
 	
 	
 	
+/* Wait for a fresh detection of a material color (camera modes 1..6). */
+static void WaitMaterialColor(uint8_t color)
+{
+    uint8_t mode = (uint8_t)(color - '0');
+    uint8_t command = mode <= 3 ? (uint8_t)('7' + mode - 1) : mode;
+    uint8_t expected = mode <= 3 ? (uint8_t)(0xA3 + mode) : 0xA3;
+    uint32_t first_frames = camera_debug_frames;
+
+    Usart_SendByte4(UART4, command);
+    while (1)
+    {
+        fuwei();
+        if (camera_debug_frames != first_frames && maixcam_mode == mode &&
+            maixcam_found && uart4_RxDataopenmv[0] == expected)
+            return;
+    }
+}
+
 void yuanliao()
 {
 	/* Wang Kai route: inter-station travel. */
@@ -313,81 +332,14 @@ void yuanliao()
 	
 	zhuazikai();
 
-	if (saoma_data[1] == '1'){
-		Usart_SendByte4(UART4,'7');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa4){
-			delay_ms(50);
-			
-			wuliao2();
-			break;
-		}
-	}
-	}
-	else if (saoma_data[1] == '2'){
-		Usart_SendByte4(UART4,'8');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa5){
-			delay_ms(50);
-			
-			wuliao2();
-			break;
-		}
-	}
-	}
-	else if (saoma_data[1] == '3'){
-		Usart_SendByte4(UART4,'9');
-		while(1){
-						fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa6){
-			delay_ms(50);
-
-			wuliao2();	
-			break;
-		}
-	}
-	}
-	
+	WaitMaterialColor(saoma_data[1]);
+	delay_ms(50);
+	wuliao2();
 	zhuazikai();
-	
-	if (saoma_data[2] == '1'){
-		Usart_SendByte4(UART4,'7');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa4){
-			delay_ms(50);
-			
-			wuliao3();
-			break;
-		}
-	}
-	}
-	else if (saoma_data[2] == '2'){
-		Usart_SendByte4(UART4,'8');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa5){
-			delay_ms(50);
-			
-			wuliao3();
-			break;
-		}
-	}
-	}
-	else if (saoma_data[2] == '3'){
-		Usart_SendByte4(UART4,'9');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa6){
-			delay_ms(50);
-			
-			wuliao3();
-			break;
-		}
-	}
-	}
+
+	WaitMaterialColor(saoma_data[2]);
+	delay_ms(50);
+	wuliao3();
 
 }
 
@@ -757,18 +709,8 @@ void zancunqu()
 void yuanliao2()
 {
 	/* Wang Kai route: inter-station travel. */
-	if (saoma_data[2] == '1'){
-		delay_ms(350);
-		zhou(fang1);
-	}
-	else if (saoma_data[2] == '2'){
-		delay_ms(350);
-		zhou(fang1);
-	}
-	else if (saoma_data[2] == '3'){
-		delay_ms(350);
-		zhou(fang1);
-	}
+	delay_ms(350);
+	zhou(fang1);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
@@ -801,81 +743,14 @@ void yuanliao2()
 	
 	zhuazikai();
 
-	if (saoma_data[9] == '1'){
-		Usart_SendByte4(UART4,'7');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa4){
-			delay_ms(50);
-			
-			wuliao2();
-			break;
-		}
-	}
-	}
-	else if (saoma_data[9] == '2'){
-		Usart_SendByte4(UART4,'8');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa5){
-			delay_ms(50);
-			
-			wuliao2();
-			break;
-		}
-	}
-	}
-	else if (saoma_data[9] == '3'){
-		Usart_SendByte4(UART4,'9');
-		while(1){
-						fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa6){
-			delay_ms(50);
-
-			wuliao2();	
-			break;
-		}
-	}
-	}
-	
+	WaitMaterialColor(saoma_data[9]);
+	delay_ms(50);
+	wuliao2();
 	zhuazikai();
-	
-	if (saoma_data[10] == '1'){
-		Usart_SendByte4(UART4,'7');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa4){
-			delay_ms(50);
-			
-			wuliao3();
-			break;
-		}
-	}
-	}
-	else if (saoma_data[10] == '2'){
-		Usart_SendByte4(UART4,'8');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa5){
-			delay_ms(50);
-			
-			wuliao3();
-			break;
-		}
-	}
-	}
-	else if (saoma_data[10] == '3'){
-		Usart_SendByte4(UART4,'9');
-		while(1){
-			fuwei();
-		if (uart4_RxDataopenmv[0] == 0xa6){
-			delay_ms(50);
-			
-			wuliao3();
-			break;
-		}
-	}
-	}
+
+	WaitMaterialColor(saoma_data[10]);
+	delay_ms(50);
+	wuliao3();
 
 }
 
@@ -1113,19 +988,19 @@ void zancunqu2()
 	if (saoma_data[12] == '1'){
 		car(1,500,1850*4);
 			fuwei();
-		vision(first_round_color_for_ring('1'));
+		vision((char)(first_round_color_for_ring('1') - '0'));
 		maduo1();
 		
 		if (saoma_data[13] == '2'){
 			car(2,500,1850*4);
 				fuwei();
-			vision(first_round_color_for_ring('2'));
+			vision((char)(first_round_color_for_ring('2') - '0'));
 			maduo2();
 			
 			if (saoma_data[14]=='3'){
 				car(2,500,1850*4);
 					fuwei();
-				vision(first_round_color_for_ring('3'));
+				vision((char)(first_round_color_for_ring('3') - '0'));
 				maduo_z(fang3);
 
 			}
@@ -1134,12 +1009,12 @@ void zancunqu2()
 		if (saoma_data[13] == '3'){
 			car(2,500,3700*4);
 				fuwei();
-			vision(first_round_color_for_ring('3'));
+			vision((char)(first_round_color_for_ring('3') - '0'));
 			maduo2();
 			if (saoma_data[14] == '2'){
 				car(1,500,1850*4);
 					fuwei();
-				vision(first_round_color_for_ring('2'));
+				vision((char)(first_round_color_for_ring('2') - '0'));
 				maduo_z(fang3);
 				
 			}
@@ -1149,18 +1024,18 @@ void zancunqu2()
 	
 	if (saoma_data[12] == '2'){
 	fuwei();
-		vision(first_round_color_for_ring('2'));
+		vision((char)(first_round_color_for_ring('2') - '0'));
 		maduo1();
 		
 		if (saoma_data[13] == '1'){
 			car(1,500,1850*4);
 				fuwei();
-			vision(first_round_color_for_ring('1'));
+			vision((char)(first_round_color_for_ring('1') - '0'));
 			maduo_z(fang2);
 			if (saoma_data[14] == '3'){
 				car(2,500,3700*4);
 					fuwei();
-				vision(first_round_color_for_ring('3'));
+				vision((char)(first_round_color_for_ring('3') - '0'));
 				maduo_z(fang3);
 				
 			}
@@ -1169,12 +1044,12 @@ void zancunqu2()
 		if (saoma_data[13] == '3'){
 			car(2,500,1850*4);
 				fuwei();
-			vision(first_round_color_for_ring('3'));
+			vision((char)(first_round_color_for_ring('3') - '0'));
 			maduo2();
 			if (saoma_data[14] == '1'){
 				car(1,500,3700*4);
 					fuwei();
-				vision(first_round_color_for_ring('1'));
+				vision((char)(first_round_color_for_ring('1') - '0'));
 				maduo3();
 				
 			}
@@ -1185,18 +1060,18 @@ void zancunqu2()
 	if (saoma_data[12] == '3'){
 		car(2,500,1850*4);
 			fuwei();
-		vision(first_round_color_for_ring('3'));
+		vision((char)(first_round_color_for_ring('3') - '0'));
 		maduo1();
 		
 		if (saoma_data[13] == '2'){
 			car(1,500,1850*4);
 				fuwei();
-			vision(first_round_color_for_ring('2'));
+			vision((char)(first_round_color_for_ring('2') - '0'));
 			maduo_z(fang2);
 			if (saoma_data[14] == '1'){
 				car(1,500,1850*4);
 					fuwei();
-				vision(first_round_color_for_ring('1'));
+				vision((char)(first_round_color_for_ring('1') - '0'));
 				maduo3();
 
 			}
@@ -1205,12 +1080,12 @@ void zancunqu2()
 		if (saoma_data[13] == '1'){
 			car(1,500,3700*4);
 				fuwei();
-			vision(first_round_color_for_ring('1'));
+			vision((char)(first_round_color_for_ring('1') - '0'));
 			maduo2();
 			if (saoma_data[14] == '2'){
 				car(2,500,1850*4);
 					fuwei();
-				vision(first_round_color_for_ring('2'));
+				vision((char)(first_round_color_for_ring('2') - '0'));
 				maduo_z(fang3);
 				
 			}

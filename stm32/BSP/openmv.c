@@ -640,7 +640,8 @@ void WL_dingwei(char WL){
         first_seen_frames = camera_debug_frames;
         first_start_ms = CameraDebug_NowMs();
         __set_PRIMASK(first_irq_mask);
-        Usart_SendByte4(UART4,WL);
+        /* ASCII 4..6 means a ring in UART4; send raw color mode. */
+        Usart_SendByte4(UART4, (uint8_t)(WL - '0'));
         scanner_stage = 5;
 	WL_AlignDelay(20);
 	while(flag_n<2){
