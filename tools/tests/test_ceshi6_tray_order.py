@@ -1,7 +1,8 @@
 """Execute ceshi6 with mocked hardware for all 36 color/ring permutations.
 
 Only the simulated scan literal and function name vary between test cases.
-The route and handling calls come directly from the selected task.c.
+The route and handling calls come directly from the selected task.c. Check that
+the formal first-round coarse-processing action block is identical.
 """
 import argparse
 import itertools
@@ -28,7 +29,14 @@ def main():
     parser.add_argument("--cc", default="gcc")
     args = parser.parse_args()
     source = read_source(args.source_root / "BSP/task.c")
+    formal_start = source.index("void cujiagong()")
     start = source.index("void ceshi6(void)")
+    action_marker = "//***********放物料*************"
+    formal_actions = source[source.index(action_marker, formal_start, start):
+                            source.index("\n}", formal_start, start)]
+    test_actions = source[source.index(action_marker, start):
+                          source.index("\n}", start)]
+    assert formal_actions == test_actions, "cujiagong actions differ from ceshi6"
     opening = source.index("{", start)
     depth = 1
     end = opening + 1
