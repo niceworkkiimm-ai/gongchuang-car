@@ -791,21 +791,23 @@ void yuanliao2()
 	zhuazikai();
 	zhuanpan0();
 	delay_ms(300);
-	
 	fuwei();
+	
+	Scanner_WaitForData(); // 行走中持续接收扫码，到此还未收到则等待
 	WL_dingwei(saoma_data[4]);
 	delay_ms(50);
 	wuliao1();
+	fuwei();
 	
 	zhuazikai();
-	
+
 	if (saoma_data[5] == '1'){
 		Usart_SendByte4(UART4,'7');
 		while(1){
 			fuwei();
 		if (uart4_RxDataopenmv[0] == 0xa4){
 			delay_ms(50);
-			fuwei();
+			
 			wuliao2();
 			break;
 		}
@@ -826,7 +828,7 @@ void yuanliao2()
 	else if (saoma_data[5] == '3'){
 		Usart_SendByte4(UART4,'9');
 		while(1){
-		fuwei();
+						fuwei();
 		if (uart4_RxDataopenmv[0] == 0xa6){
 			delay_ms(50);
 
@@ -874,7 +876,7 @@ void yuanliao2()
 		}
 	}
 	}
-	
+
 }
 
 
