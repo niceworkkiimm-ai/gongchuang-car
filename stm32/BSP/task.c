@@ -716,7 +716,7 @@ void yuanliao2()
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(300);
-	car(2,speed,11500*4);
+	car(2,speed,13000*4);
 	delay_ms(300);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
@@ -727,7 +727,7 @@ void yuanliao2()
 	delay_ms(400);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,12000*4);
+	car(2,speed,11000*4);
 	delay_ms(300);
 
 	zhuazikai();
@@ -969,6 +969,10 @@ static uint8_t first_round_color_for_ring(uint8_t ring)
 
 void zancunqu2()
 {
+    int tray, ring;
+    int current_ring = 2;
+    int target_rings[3] = {0, 0, 0};
+    int exit_ring;
 	/* Wang Kai route: inter-station travel. */
 	delay_ms(300);
 	car(0,-90,0);
@@ -987,113 +991,54 @@ void zancunqu2()
 	zhou(guiwei);    //夹子正对物料
 
 		//***********放物料*************
-	/* Placement order: QR digit 4 -> 5 -> 6, excluding the '+' separator. */
-	if (saoma_data[12] == '1'){
-		car(1,500,1850*4);
-			fuwei();
-		vision((char)(first_round_color_for_ring('1') - '0'));
-		maduo1();
-		
-		if (saoma_data[13] == '2'){
-			car(2,500,1850*4);
-				fuwei();
-			vision((char)(first_round_color_for_ring('2') - '0'));
-			maduo2();
-			
-			if (saoma_data[14]=='3'){
-				car(2,500,1850*4);
-					fuwei();
-				vision((char)(first_round_color_for_ring('3') - '0'));
-				maduo_z(fang3);
+    /* Third QR group gives tray 1/2/3 colors. Find each color in layer one. */
+    for (tray = 0; tray < 3; ++tray)
+    {
+        for (ring = 1; ring <= 3; ++ring)
+        {
+            if (first_round_color_for_ring((uint8_t)('0' + ring)) ==
+                saoma_data[8 + tray])
+            {
+                target_rings[tray] = ring;
+                break;
+            }
+        }
+        /* No same-color base exists: wait here instead of stacking elsewhere. */
+        if (target_rings[tray] == 0)
+            while (1) delay_ms(1);
+    }
 
-			}
-			}
-		
-		if (saoma_data[13] == '3'){
-			car(2,500,3700*4);
-				fuwei();
-			vision((char)(first_round_color_for_ring('3') - '0'));
-			maduo2();
-			if (saoma_data[14] == '2'){
-				car(1,500,1850*4);
-					fuwei();
-				vision((char)(first_round_color_for_ring('2') - '0'));
-				maduo_z(fang3);
-				
-			}
-		}
-	}
-	
-	
-	if (saoma_data[12] == '2'){
-	fuwei();
-		vision((char)(first_round_color_for_ring('2') - '0'));
-		maduo1();
-		
-		if (saoma_data[13] == '1'){
-			car(1,500,1850*4);
-				fuwei();
-			vision((char)(first_round_color_for_ring('1') - '0'));
-			maduo_z(fang2);
-			if (saoma_data[14] == '3'){
-				car(2,500,3700*4);
-					fuwei();
-				vision((char)(first_round_color_for_ring('3') - '0'));
-				maduo_z(fang3);
-				
-			}
-		}
-		
-		if (saoma_data[13] == '3'){
-			car(2,500,1850*4);
-				fuwei();
-			vision((char)(first_round_color_for_ring('3') - '0'));
-			maduo2();
-			if (saoma_data[14] == '1'){
-				car(1,500,3700*4);
-					fuwei();
-				vision((char)(first_round_color_for_ring('1') - '0'));
-				maduo3();
-				
-			}
-		}
-	}
-	
-	
-	if (saoma_data[12] == '3'){
-		car(2,500,1850*4);
-			fuwei();
-		vision((char)(first_round_color_for_ring('3') - '0'));
-		maduo1();
-		
-		if (saoma_data[13] == '2'){
-			car(1,500,1850*4);
-				fuwei();
-			vision((char)(first_round_color_for_ring('2') - '0'));
-			maduo_z(fang2);
-			if (saoma_data[14] == '1'){
-				car(1,500,1850*4);
-					fuwei();
-				vision((char)(first_round_color_for_ring('1') - '0'));
-				maduo3();
+    /* Preserve the old return-route starting ring after all three stacks. */
+    exit_ring = saoma_data[14] - '0';
+    if (exit_ring < 1 || exit_ring > 3)
+        while (1) delay_ms(1);
 
-			}
-		}
-		
-		if (saoma_data[13] == '1'){
-			car(1,500,3700*4);
-				fuwei();
-			vision((char)(first_round_color_for_ring('1') - '0'));
-			maduo2();
-			if (saoma_data[14] == '2'){
-				car(2,500,1850*4);
-					fuwei();
-				vision((char)(first_round_color_for_ring('2') - '0'));
-				maduo_z(fang3);
-				
-			}
-		}
-	}
+    /* Pick trays 3 -> 2 -> 1, matching the requested reverse pickup order. */
+    for (tray = 3; tray >= 1; --tray)
+    {
+        ring = target_rings[tray - 1];
+        if (ring > current_ring)
+            car(2, 500, (ring - current_ring) * 1850 * 4);
+        else if (ring < current_ring)
+            car(1, 500, (current_ring - ring) * 1850 * 4);
+        current_ring = ring;
+
+        fuwei();
+        /* Raw modes 1..6 align to the same-color material in layer one. */
+        vision((char)(saoma_data[7 + tray] - '0'));
+        if (tray == 3)
+            maduo3();
+        else if (tray == 2)
+            maduo2();
+        else
+            maduo1();
+    }
+
+    /* Group four no longer chooses stacking targets; retain only its exit. */
+    if (exit_ring > current_ring)
+        car(2, 500, (exit_ring - current_ring) * 1850 * 4);
+    else if (exit_ring < current_ring)
+        car(1, 500, (current_ring - exit_ring) * 1850 * 4);
 }
 
 

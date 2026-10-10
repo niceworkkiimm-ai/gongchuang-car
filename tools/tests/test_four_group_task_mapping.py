@@ -12,14 +12,20 @@ HARNESS = r'''
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <setjmp.h>
 
 static uint8_t saoma_data[16];
-static int fang2 = -20, fang3 = 17;
 static int current_ring, phase, held, trays[4], original[4];
 static int rings[4], first_layer[4], second_layer[4];
 static int placed, retrieved, stacked;
+static int expect_hold;
+static jmp_buf hold_state;
 
-static void delay_ms(int ms) { assert(ms >= 0); }
+static void delay_ms(int ms)
+{
+    assert(ms >= 0);
+    if (expect_hold) longjmp(hold_state, 1);
+}
 static void fuwei(void) {}
 static void move(int mode, int pulses)
 {
@@ -76,7 +82,8 @@ static void zancun_na(int mode, int rpm, int pulses, int tray)
 static void stack_from_tray(int tray)
 {
     assert(phase == 1 && trays[tray] == original[tray]);
-    assert(current_ring == saoma_data[11 + tray] - '0');
+    assert(tray == 3 - stacked);
+    assert(first_layer[current_ring] - '0' == trays[tray]);
     assert(first_layer[current_ring] && !second_layer[current_ring]);
     second_layer[current_ring] = trays[tray]; trays[tray] = 0;
     ++stacked;
@@ -84,11 +91,6 @@ static void stack_from_tray(int tray)
 static void maduo1(void) { stack_from_tray(1); }
 static void maduo2(void) { stack_from_tray(2); }
 static void maduo3(void) { stack_from_tray(3); }
-static void maduo_z(int angle)
-{
-    assert(angle == fang2 || angle == fang3);
-    stack_from_tray(angle == fang2 ? 2 : 3);
-}
 
 /* INSERT_COLOR_LOOKUP */
 /* INSERT_COARSE_ACTIONS */
@@ -98,6 +100,7 @@ static void run_case(const char *first_colors, const char *first_rings,
                      const char *second_colors, const char *second_rings)
 {
     int i;
+    uint8_t saved_scan[16];
     memset(saoma_data, 0, sizeof(saoma_data));
     memcpy(saoma_data, first_colors, 3);
     saoma_data[3] = '+';
@@ -106,6 +109,7 @@ static void run_case(const char *first_colors, const char *first_rings,
     memcpy(saoma_data + 8, second_colors, 3);
     saoma_data[11] = '+';
     memcpy(saoma_data + 12, second_rings, 3);
+    memcpy(saved_scan, saoma_data, sizeof(saved_scan));
     memset(trays, 0, sizeof(trays));
     memset(rings, 0, sizeof(rings));
     memset(first_layer, 0, sizeof(first_layer));
@@ -127,21 +131,41 @@ static void run_case(const char *first_colors, const char *first_rings,
     assert(stacked == 3 && current_ring == second_rings[2] - '0');
     for (i = 0; i < 3; ++i) {
         assert(!trays[i + 1]);
-        assert(second_layer[second_rings[i] - '0'] == second_colors[i] - '0');
+        assert(second_layer[i + 1] == first_layer[i + 1] - '0');
     }
+    assert(memcmp(saved_scan, saoma_data, sizeof(saved_scan)) == 0);
 }
 
 int main(void)
 {
     const char *cases[] = {"123", "132", "213", "231", "312", "321"};
-    const char *colors[] = {"123", "156", "516", "456", "654", "246"};
-    int a, b, c, d;
-    for (a = 0; a < 6; ++a)
-        for (b = 0; b < 6; ++b)
-            for (c = 0; c < 6; ++c)
+    char first[4] = {0}, second[4] = {0};
+    int a, b, c, d, e, f, i, count = 0;
+    for (a = '1'; a <= '6'; ++a)
+        for (b = '1'; b <= '6'; ++b)
+            for (c = '1'; c <= '6'; ++c) {
+                if (a == b || a == c || b == c) continue;
+                first[0] = a; first[1] = b; first[2] = c;
                 for (d = 0; d < 6; ++d)
-                    run_case(colors[a], cases[b], colors[c], cases[d]);
-    puts("PASS: 1296 four-group combinations, including colors 1..6, preserve tray mapping and stack at group-4 rings.");
+                    for (e = 0; e < 6; ++e)
+                        for (f = 0; f < 6; ++f) {
+                            for (i = 0; i < 3; ++i)
+                                second[i] = first[cases[e][i] - '1'];
+                            run_case(first, cases[d], second, cases[f]);
+                            ++count;
+                        }
+            }
+    assert(count == 25920);
+    run_case("123", "321", "213", "123");
+    memcpy(saoma_data, "123+321+456+123", 16);
+    stacked = 0; current_ring = 2; phase = 1; expect_hold = 1;
+    if (setjmp(hold_state) == 0) {
+        second_stack_actions();
+        assert(0); /* Missing same-color bases must not fall through to return. */
+    }
+    assert(stacked == 0 && current_ring == 2);
+    puts("PASS: 25920 six-color cases preserve coarse tray mapping, stack trays 3/2/1 on matching colors, and retain the old exit ring.");
+    puts("PASS: missing same-color bases hold before stacking; task scan stays unchanged.");
     return 0;
 }
 '''
@@ -175,6 +199,14 @@ def main():
     lookup = function(source, "static uint8_t first_round_color_for_ring(uint8_t ring)")
     coarse = actions(source, "void cujiagong2()")
     stack = actions(source, "void zancunqu2()")
+    stack_function = function(source, "void zancunqu2()")
+    stack_locals = stack_function[stack_function.index("{") + 1:
+                                  stack_function.index("/* Wang Kai route:")]
+    mechanics = (args.source_root / "hardware/wuliao.c").read_bytes().decode("latin1")
+    for tray in (1, 2, 3):
+        mechanical_function = function(mechanics, f"void maduo{tray}(void)")
+        mechanical_function = re.sub(r"//[^\n]*", "", mechanical_function)
+        assert f"zhou(fang{tray});" in mechanical_function
     first_actions = actions(source, "void cujiagong()")
     for first_index, second_index in ((6, 14), (5, 13), (4, 12)):
         first_actions = first_actions.replace(
@@ -196,7 +228,8 @@ def main():
                         "const int ring_center_x = 175, ring_center_y = 139;\n"
                         + coarse + "\n}")
     code = code.replace("/* INSERT_STACK_ACTIONS */",
-                        "static void second_stack_actions(void)\n{\n" + stack + "\n}")
+                        "static void second_stack_actions(void)\n{\n"
+                        + stack_locals + stack + "\n}")
     with tempfile.TemporaryDirectory(prefix="four-group-task-") as directory:
         c_file = Path(directory) / "test.c"
         exe = Path(directory) / "test.exe"
