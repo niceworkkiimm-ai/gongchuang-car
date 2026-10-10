@@ -1584,6 +1584,7 @@ void ceshi6(void)
 				delay_ms(200);
 				zancun_na(1,500,1850*4,2);
 				fnwuliao3();
+				car(2,500,1850*4); /* From ring 1 back to center ring 2. */
 			}
 			}
 		
@@ -1598,7 +1599,6 @@ void ceshi6(void)
 				vision_at('5', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				/* Already at ring 2: recover tray 1, then rings 3/1 for trays 2/3. */
@@ -1610,6 +1610,7 @@ void ceshi6(void)
 				delay_ms(200);
 				zancun_na(1,500,3700*4,2);
 				fnwuliao3();
+				car(2,500,1850*4); /* From ring 1 back to center ring 2. */
 			}
 		}
 	}
@@ -1632,7 +1633,6 @@ void ceshi6(void)
 				vision_at('6', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				/* Already at ring 3: recover tray 1, then rings 1/2 for trays 2/3. */
@@ -1644,6 +1644,7 @@ void ceshi6(void)
 				delay_ms(200);
 				zancun_na(2,500,1850*4,2);
 				fnwuliao3();
+				/* At center ring 2; ready for the next task. */
 			}
 		}
 		
@@ -1658,7 +1659,6 @@ void ceshi6(void)
 				vision_at('4', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				/* Already at ring 1: recover tray 1, then rings 3/2 for trays 2/3. */
@@ -1670,6 +1670,7 @@ void ceshi6(void)
 				delay_ms(200);
 				zancun_na(1,500,1850*4,2);
 				fnwuliao3();
+				/* At center ring 2; ready for the next task. */
 			}
 		}
 	}
@@ -1692,7 +1693,6 @@ void ceshi6(void)
 				vision_at('4', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				/* Already at ring 1: recover tray 1, then rings 2/3 for trays 2/3. */
@@ -1704,6 +1704,7 @@ void ceshi6(void)
 				delay_ms(200);
 				zancun_na(2,500,1850*4,2);
 				fnwuliao3();
+				car(1,500,1850*4); /* From ring 3 back to center ring 2. */
 			}
 		}
 		
@@ -1718,7 +1719,6 @@ void ceshi6(void)
 				vision_at('5', ring_center_x, ring_center_y);
 				fwuliao3();
 				
-				car(0,-90,0);
 				delay_ms(100);
 				//**************抓物料**************	
 				/* Already at ring 2: recover tray 1, then rings 1/3 for trays 2/3. */
@@ -1730,6 +1730,7 @@ void ceshi6(void)
 				delay_ms(200);
 				zancun_na(2,500,3700*4,2);
 				fnwuliao3();
+				car(1,500,1850*4); /* From ring 3 back to center ring 2. */
 			}
 		}
 	}

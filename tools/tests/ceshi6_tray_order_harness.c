@@ -34,11 +34,7 @@ static void move_ring(int direction, int pulses)
 }
 static void car(int direction, int speed, int pulses)
 {
-    if (direction == 0) {
-        assert(speed == -90 && pulses == 0);
-        return;
-    }
-    assert(speed == 500);
+    assert((direction == 1 || direction == 2) && speed == 500);
     move_ring(direction, pulses);
 }
 static void vision_at(char mode, int center_x, int center_y)
@@ -97,13 +93,13 @@ static void run_case(const char *scan, void (*function)(void))
         assert(retrieval[i] == scan[4 + i] - '0');
         assert(trays[i + 1] == original[i + 1] && !rings[i + 1]);
     }
-    assert(current_ring == scan[6] - '0');
+    assert(current_ring == 2);
 }
 
 int main(void)
 {
     /* INSERT_CASES */
     puts("PASS: all 36 color/ring permutations restore trays 1, 2, 3;");
-    puts("PASS: placement order, ring movement, pickup order and final position.");
+    puts("PASS: placement order, pickup order, no -90 turn and return to ring 2.");
     return 0;
 }
