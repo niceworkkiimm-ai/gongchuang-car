@@ -371,6 +371,7 @@ void cujiagong()
 	
 	car(5,speed,4450*4);
 	delay_ms(200);
+	car(0,-90,0);
 	
 	zhou(guiwei);   
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降	
@@ -762,12 +763,15 @@ void cujiagong2()
 	/* Wang Kai route: inter-station travel. */
 	car(6,speed,4500*4);
 	delay_ms(300);
+	car(0,0,0);
 	car(2,speed,22500*4);
 	delay_ms(50);
 	zhou(guiwei);    //夹子正对物料
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降
 	delay_ms(650);
 	car(6,speed,4450*4);
+	delay_ms(300);
+	car(0,-90,0);
 
 	//***********放物料*************
 	/* At the rings: car(1) moves toward ring 1; car(2) toward ring 3. */
