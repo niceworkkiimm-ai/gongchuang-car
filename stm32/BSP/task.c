@@ -1917,3 +1917,56 @@ void ceshi8(void)
 	
 	
 }
+
+/* Test only: start at temporary-zone ring 2 with the second batch on trays.
+ * First-layer materials must already be on their corresponding rings.
+ * Uses the current scan data; no station travel or gyro heading correction.
+ * Stop at the third stacking ring, without the formal return-to-ring-2 move.
+ */
+void ceshi9(void)
+{
+    int tray, ring;
+    int current_ring = 2;
+    int target_rings[3] = {0, 0, 0};
+    /* Tune this test center independently; copy proven values to zancunqu2(). */
+    const int stack_center_x = 155;
+    const int stack_center_y = 125;
+
+    zhou(guiwei);
+    /* Map each second-batch tray color to its first-layer ring. */
+    for (tray = 0; tray < 3; ++tray)
+    {
+        for (ring = 1; ring <= 3; ++ring)
+        {
+            if (first_round_color_for_ring((uint8_t)('0' + ring)) ==
+                saoma_data[8 + tray])
+            {
+                target_rings[tray] = ring;
+                break;
+            }
+        }
+        if (target_rings[tray] == 0)
+            while (1) delay_ms(1);
+    }
+
+    /* Tray 3 -> tray 2 -> tray 1; match each color with the first layer. */
+    for (tray = 3; tray >= 1; --tray)
+    {
+        ring = target_rings[tray - 1];
+        if (ring > current_ring)
+            car(2, 500, (ring - current_ring) * 1850 * 4);
+        else if (ring < current_ring)
+            car(1, 500, (current_ring - ring) * 1850 * 4);
+        current_ring = ring;
+
+        fuwei();
+        vision_at((char)(saoma_data[7 + tray] - '0'),
+                  stack_center_x, stack_center_y);
+        if (tray == 3)
+            maduo3();
+        else if (tray == 2)
+            maduo2();
+        else
+            maduo1();
+    }
+}
