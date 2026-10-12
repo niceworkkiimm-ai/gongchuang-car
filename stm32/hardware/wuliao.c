@@ -23,12 +23,12 @@
 extern __IO uint8_t rxCmd[FIFO_SIZE];
 
 
-int zhua1=309;
+int zhua1=308;
 int zhua2=-16;
 int zhua3=17;
 int fang1=308;
 int fang3=17;
-int fang2=-20;
+int fang2=-16;
 
 int zhua=167;
 int fang=150;
@@ -318,7 +318,7 @@ void fnwuliao1(void)
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 13310, 0, 0);        //升降台下降
 	
-	delay_ms(1500);
+	delay_ms(1200);
 		
 	jiazi(zhua);           //抓物料1
 		
@@ -349,7 +349,7 @@ void fnwuliao2(void)
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 13310, 0, 0);        //升降台下降
 	
-	delay_ms(1500);
+	delay_ms(1200);
 		
 		jiazi(zhua);           //抓物料2
 		
@@ -380,7 +380,7 @@ void fnwuliao3(void)
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 13310, 0, 0);        //升降台下降
 	
-	delay_ms(1500);
+	delay_ms(1200);
 		
 		jiazi(zhua);           //抓物料3
 		
@@ -407,25 +407,25 @@ void maduo1(void)
 	jiazi(fang);
 	zhou(fang1);       //转至物料1位置
 	
-	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 2000*4, 0, 0);    //升降台降
+	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 4550, 0, 0);    //升降台降
 	
 	delay_ms(650);
 
 	jiazi(zhua);     //抓物料1
 		
-	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 2000*4, 0, 0);      //升降台升
+	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 4550, 0, 0);      //升降台升
 	
 	delay_ms(150);
 	
 	zhou(guiwei);       //转回0位置
 	
-	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 2600*4, 0, 0);     //升降台降
+	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 6800, 0, 0);     //升降台降
 	
 	delay_ms(650);
 	
 	jiazi(fang);	    //放物料1
 		
-	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 2600*4, 0, 0);    //升降台升
+	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 6800, 0, 0);    //升降台升
 	
 	delay_ms(200);
 	
@@ -437,25 +437,25 @@ void maduo2(void)
 	jiazi(fang);
 	zhou(fang2);       //转至物料2位置
 	
-	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 2000*4, 0, 0);    //升降台降
+	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 4550, 0, 0);    //升降台降
 	
 	delay_ms(650);
 
 	jiazi(zhua);     //抓物料2
 		
-	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 2000*4, 0, 0);      //升降台升
+	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 4550, 0, 0);      //升降台升
 	
 	delay_ms(150);
 	
 	zhou(guiwei);       //转回0位置
 	
-	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 2600*4, 0, 0);     //升降台降
+	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 6800, 0, 0);     //升降台降
 	
 	delay_ms(650);
 	
 	jiazi(fang);	    //放物料1
 		
-	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 2600*4, 0, 0);    //升降台升
+	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 6800, 0, 0);    //升降台升
 	
 	delay_ms(200);
 	
@@ -518,25 +518,25 @@ void maduo3(void)
 	jiazi(fang);
 	zhou(fang3);       //转至物料3位置
 	
-	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 2000*4, 0, 0);    //升降台降
+	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 4550, 0, 0);    //升降台降
 	
 	delay_ms(650);
 
 	jiazi(zhua);     //抓物料3
 		
-	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 2000*4, 0, 0);      //升降台升
+	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 4550, 0, 0);      //升降台升
 	
 	delay_ms(150);
 	
 	zhou(guiwei);       //转回0位置
 	
-	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 2600*4, 0, 0);     //升降台降
+	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 6800, 0, 0);     //升降台降
 	
 	delay_ms(650);
 	
 	jiazi(fang);	    //放物料3
 		
-	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 2600*4, 0, 0);    //升降台升
+	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 6800, 0, 0);    //升降台升
 	
 //	delay_ms(350);
 	
@@ -654,3 +654,5 @@ void RedAlignTest_Run(void)
     for (;;)
         delay_ms(100); /* Keep UART reception and OLED updates running forever. */
 }
+
+

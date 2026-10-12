@@ -11,7 +11,7 @@
 int speed_hua2=500;
 int speed_hua_jia2=200;
 int speed=500;
-extern float anglea;
+extern volatile float anglea;
 
 void zancun_na(dir,speed,location,WL){
 		if (dir == 1) 
@@ -295,14 +295,14 @@ void yuanliao()
 	delay_ms(300);
 	car(0,0,0);
 	delay_ms(50);
-	car(2,speed,12000*4);	//走到扫码区
+	car(2,speed,11500*4);	//走到扫码区
 	car(0,0,0);
 	delay_ms(50);
 	car(6,speed,4450*4);	//原地转弯
 	delay_ms(400);
 	car(0,-90,0);			//
 	delay_ms(50);
-	car(2,speed,11500*4);	//走到中心
+	car(2,speed,11750*4);	//走到中心
 	delay_ms(100);
 	car(6,speed,4450*4);	//原地转弯
 	delay_ms(400);
@@ -311,7 +311,7 @@ void yuanliao()
 	else if( anglea>=-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(100);
-	car(2,speed,12000*4);
+	car(2,speed,11250*4);
 	delay_ms(50);
 	
 	car(6,speed,4450*4);
@@ -355,20 +355,9 @@ void cujiagong()
 	car(5,speed,4450*4);
 	delay_ms(400);
 	
-	if (anglea<180 && anglea>=0)
-		car(0,180,0);
-	else if( anglea>-180 && anglea <=0)
-		car(0,-180,0);
-	
 	car(1,speed,11000*8);
 	delay_ms(1000);
-	
-	if (anglea<180 && anglea>=0)
-		car(0,180,0);
-	else if( anglea>-180 && anglea <=0)
-		car(0,-180,0);
-	delay_ms(200);
-	
+
 	car(5,speed,4450*4);
 	delay_ms(200);
 	car(0,-90,0);
@@ -578,7 +567,7 @@ void zancunqu()
 	delay_ms(400);
 	car(0,-90,0);
 	delay_ms(50);
-	car(2,speed,11500*4);
+	car(2,speed,11000*4);
 	delay_ms(50);
 	car(6,speed,4450*4);
 	delay_ms(400);
@@ -702,6 +691,13 @@ void zancunqu()
 	
 	
 	
+    /* Return to center ring 2 after the final placement at scan[4]. */
+    if (saoma_data[4] == '1')
+        car(2,500,1850*4); // 从1号圆环回到中间2号圆环
+    else if (saoma_data[4] == '3')
+        car(1,500,1850*4); // 从3号圆环回到中间2号圆环
+    /* scan[4] == '2': already at center; no movement. */
+
 }
 
 
@@ -717,7 +713,7 @@ void yuanliao2()
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(300);
-	car(2,speed,13000*4);
+	car(2,speed,11750*4);
 	delay_ms(300);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
@@ -728,7 +724,7 @@ void yuanliao2()
 	delay_ms(400);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,11000*4);
+	car(2,speed,10750*4);
 	delay_ms(300);
 
 	zhuazikai();
@@ -764,7 +760,7 @@ void cujiagong2()
 	car(6,speed,4500*4);
 	delay_ms(300);
 	car(0,0,0);
-	car(2,speed,22500*4);
+	car(2,speed,22000*4);
 	delay_ms(50);
 	zhou(guiwei);    //夹子正对物料
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降
@@ -1012,10 +1008,8 @@ void zancunqu2()
             while (1) delay_ms(1);
     }
 
-    /* Preserve the old return-route starting ring after all three stacks. */
-    exit_ring = saoma_data[14] - '0';
-    if (exit_ring < 1 || exit_ring > 3)
-        while (1) delay_ms(1);
+    /* Always return to center ring 2 after all three stacks. */
+    exit_ring = 2;
 
     /* Pick trays 3 -> 2 -> 1, matching the requested reverse pickup order. */
     for (tray = 3; tray >= 1; --tray)
@@ -1038,7 +1032,7 @@ void zancunqu2()
             maduo1();
     }
 
-    /* Group four no longer chooses stacking targets; retain only its exit. */
+    /* Return from the last same-color stack to ring 2 before qidian(). */
     if (exit_ring > current_ring)
         car(2, 500, (exit_ring - current_ring) * 1850 * 4);
     else if (exit_ring < current_ring)
@@ -1061,18 +1055,17 @@ void qidian()
 		delay_ms(350);
 		zhou(fang1);
 	}
-	if (anglea<180 && anglea>=0)
-		car(0,180,0);
-	else if( anglea>-180 && anglea <=0)
-		car(0,-180,0);
+	
+	//调正
+	
 	delay_ms(100);
-	car(2,speed,11000*4);
+	car(2,speed,11500*4);
 	delay_ms(100);
 	car(6,speed,4450*4);
 	delay_ms(300);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,23000*4);
+	car(2,speed,20000*4);
 	delay_ms(50);
 	car(8,speed,4000*4);
 
@@ -1585,6 +1578,336 @@ void ceshi6(void)
 			}
 		}
 	}
+	
+	
+	
+	
+}
+
+/* 仅站间行走测试：沿当前主流程走两轮后回起点，不扫码、不识别、不抓放。
+ * car普通模式第三项为距离脉冲；car(0,角度,0)为陀螺仪目标朝向。
+ * 不执行圆环左右移动，因此从区域到达点直接出发；暂存区离开位置与正式任务可能不同。
+ * 本函数是独立路线副本：这里调距离不会自动改变主流程，调好后再同步对应任务函数。
+ * 保留当前主流程已有的转向与调正；不自动添加用户已删除的调正。
+ */
+void xingzou(void)
+{
+    /* 第1段：起点 -> 扫码区 -> 第一轮原料区。对应 yuanliao()。 */
+    car(9,speed,4000*4); // 斜走离开起点；距离调4000*4
+    delay_ms(300);
+    car(0,0,0); // 调正到0度
+    delay_ms(50);
+    car(2,speed,12000*4); // 走到扫码区；距离调12000*4（本测试不等待扫码）
+    car(0,0,0); // 调正到0度
+    delay_ms(50);
+    car(6,speed,4450*4); // 扫码区后第一次原地转向；转向脉冲4450*4
+    delay_ms(400);
+    car(0,-90,0); // 调正到-90度
+    delay_ms(50);
+    car(2,speed,11500*4); // 走向原料区方向的下一拐点；距离调11500*4
+    delay_ms(100);
+    car(6,speed,4450*4); // 第二次原地转向；转向脉冲4450*4
+    delay_ms(400);
+    if (anglea<=180 && anglea>=0)
+        car(0,180,0); // 调正到180度
+    else if( anglea>=-180 && anglea <=0)
+        car(0,-180,0); // 调正到-180度（与180度同一朝向）
+    delay_ms(100);
+    car(2,speed,12000*4); // 走向原料区；距离调12000*4
+    delay_ms(50);
+    car(6,speed,4450*4); // 到原料区前最后一次原地转向
+    delay_ms(400);
+    car(0,90,0); // 调正到90度；到达第一轮原料区
+    delay_ms(100);
+
+    /* 第2段：第一轮原料区 -> 第一轮粗加工区。对应 cujiagong()。 */
+    car(5,speed,4450*4); // 离开原料区，原地转向
+    delay_ms(400);
+    car(1,speed,11000*8); // 走向粗加工区；距离调11000*8，注意此处乘8
+    delay_ms(1000);
+    car(5,speed,4450*4); // 粗加工区前最后一次原地转向
+    delay_ms(200);
+    car(0,-90,0); // 调正到-90度；到达第一轮粗加工区
+
+    /* 第3段：第一轮粗加工区 -> 第一轮暂存区。对应 zancunqu()。 */
+    delay_ms(400);
+    car(0,-90,0); // 离开粗加工区前调正到-90度
+    delay_ms(50);
+    car(2,speed,11500*4); // 走向暂存区方向的拐点；距离调11500*4
+    delay_ms(50);
+    car(6,speed,4450*4); // 拐点原地转向
+    delay_ms(400);
+    if (anglea<180 && anglea>=0)
+        car(0,180,0); // 调正到180度
+    else if( anglea>-180 && anglea <=0)
+        car(0,-180,0); // 调正到-180度
+    delay_ms(100);
+    car(2,speed,11000*4); // 走到第一轮暂存区；距离调11000*4
+    delay_ms(100);
+
+    /* 第4段：第一轮暂存区 -> 第二轮原料区。对应 yuanliao2()。 */
+    delay_ms(350);
+    if (anglea<180 && anglea>=0)
+        car(0,180,0); // 离开暂存区前调正到180度
+    else if( anglea>-180 && anglea <=0)
+        car(0,-180,0); // 离开暂存区前调正到-180度
+    delay_ms(300);
+    car(2,speed,13000*4); // 走向第二轮原料区方向的拐点；距离调13000*4
+    delay_ms(300);
+    if (anglea<180 && anglea>=0)
+        car(0,180,0); // 转向前调正到180度
+    else if( anglea>-180 && anglea <=0)
+        car(0,-180,0); // 转向前调正到-180度
+    delay_ms(100);
+    car(6,speed,4450*4); // 拐点原地转向
+    delay_ms(400);
+    car(0,90,0); // 调正到90度
+    delay_ms(50);
+    car(2,speed,11000*4); // 走到第二轮原料区；距离调11000*4
+    delay_ms(300);
+
+    /* 第5段：第二轮原料区 -> 第二轮粗加工区。对应 cujiagong2()。 */
+    car(6,speed,4500*4); // 离开第二轮原料区，原地转向；此处转向脉冲4500*4
+    delay_ms(300);
+    car(0,0,0); // 调正到0度
+    car(2,speed,22500*4); // 走向第二轮粗加工区；距离调22500*4
+    delay_ms(50);
+    car(6,speed,4450*4); // 粗加工区前最后一次原地转向
+    delay_ms(300);
+    car(0,-90,0); // 调正到-90度；到达第二轮粗加工区
+
+    /* 第6段：第二轮粗加工区 -> 第二轮暂存区。对应 zancunqu2()。 */
+    delay_ms(300);
+    car(0,-90,0); // 离开粗加工区前调正到-90度
+    delay_ms(50);
+    car(2,speed,11000*4); // 走向暂存区方向的拐点；距离调11000*4
+    delay_ms(400);
+    car(6,speed,4450*4); // 拐点原地转向
+    delay_ms(300);
+    if (anglea<180 && anglea>=0)
+        car(0,180,0); // 调正到180度
+    else if( anglea>-180 && anglea <=0)
+        car(0,-180,0); // 调正到-180度
+    delay_ms(100);
+    car(2,speed,10000*4); // 走到第二轮暂存区；距离调10000*4
+    delay_ms(50);
+
+    /* 第7段：第二轮暂存区 -> 返回起点。对应 qidian()。 */
+    if (anglea<180 && anglea>=0)
+        car(0,180,0); // 返程出发前调正到180度
+    else if( anglea>-180 && anglea <=0)
+        car(0,-180,0); // 返程出发前调正到-180度
+    delay_ms(100);
+    car(2,speed,11000*4); // 离开暂存区走向返程拐点；距离调11000*4
+    delay_ms(100);
+    car(6,speed,4450*4); // 返程拐点原地转向
+    delay_ms(300);
+    car(0,90,0); // 调正到90度
+    delay_ms(50);
+    car(2,speed,23000*4); // 走向起点入口；距离调23000*4
+    delay_ms(50);
+    car(8,speed,4000*4); // 最后斜走回起点；距离调4000*4
+}
+
+
+
+void ceshi8(void)
+{
+	
+	
+	const int ring_center_x = 143;
+	const int ring_center_y = 126;
+	
+	zhou(guiwei);   
+	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降	
+	delay_ms(650);
+	
+	
+	
+	//***********放物料*************
+	/* At the rings: car(1) moves toward ring 1; car(2) toward ring 3. */
+	if (saoma_data[6] == '1'){
+		car(1,500,1850*4);
+			fuwei();		//识别并且调整
+		vision_at('4', ring_center_x, ring_center_y);
+		fwuliao1();
+		
+		if (saoma_data[5] == '2'){
+			car(2,500,1850*4);
+				fuwei();
+			vision_at('5', ring_center_x, ring_center_y);
+			fwuliao2();
+			
+			if (saoma_data[4]=='3'){
+				car(2,500,1850*4);
+				fuwei();
+				vision_at('6', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+
+				delay_ms(100);
+			//**************抓物料**************	
+				/* Already at ring 3: recover tray 1, then rings 2/1 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(1,500,1850*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(1,500,1850*4,2);
+				fnwuliao3();
+				car(2,500,1850*4); /* From ring 1 back to center ring 2. */
+			}
+			}
+		
+		if (saoma_data[5] == '3'){
+			car(2,500,3700*4);
+				fuwei();
+			vision_at('6', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '2'){
+				car(1,500,1850*4);
+				fuwei();
+				vision_at('5', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 2: recover tray 1, then rings 3/1 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(2,500,1850*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(1,500,3700*4,2);
+				fnwuliao3();
+				car(2,500,1850*4); /* From ring 1 back to center ring 2. */
+			}
+		}
+	}
+	
+	
+	if (saoma_data[6] == '2'){
+			fuwei();
+		vision_at('5', ring_center_x, ring_center_y);
+		fwuliao1();
+		
+		if (saoma_data[5] == '1'){
+			car(1,500,1850*4);
+				fuwei();
+			vision_at('4', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '3'){
+				
+				car(2,500,3700*4);
+				fuwei();
+				vision_at('6', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 3: recover tray 1, then rings 1/2 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(1,500,3700*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(2,500,1850*4,2);
+				fnwuliao3();
+				/* At center ring 2; ready for the next task. */
+			}
+		}
+		
+		if (saoma_data[5] == '3'){
+			car(2,500,1850*4);
+				fuwei();
+			vision_at('6', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '1'){
+				car(1,500,3700*4);
+				fuwei();
+				vision_at('4', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 1: recover tray 1, then rings 3/2 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(2,500,3700*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(1,500,1850*4,2);
+				fnwuliao3();
+				/* At center ring 2; ready for the next task. */
+			}
+		}
+	}
+	
+	
+	if (saoma_data[6] == '3'){
+		car(2,500,1850*4);
+		fuwei();
+		vision_at('6', ring_center_x, ring_center_y);
+		fwuliao1();
+		
+		if (saoma_data[5] == '2'){
+			car(1,500,1850*4);
+				fuwei();
+			vision_at('5', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '1'){
+				car(1,500,1850*4);
+				fuwei();
+				vision_at('4', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 1: recover tray 1, then rings 2/3 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(2,500,1850*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(2,500,1850*4,2);
+				fnwuliao3();
+				car(1,500,1850*4); /* From ring 3 back to center ring 2. */
+			}
+		}
+		
+		if (saoma_data[5] == '1'){
+			car(1,500,3700*4);
+				fuwei();
+			vision_at('4', ring_center_x, ring_center_y);
+			fwuliao2();
+			if (saoma_data[4] == '2'){
+				car(2,500,1850*4);
+				fuwei();
+				vision_at('5', ring_center_x, ring_center_y);
+				fwuliao3();
+				
+				delay_ms(100);
+				//**************抓物料**************	
+				/* Already at ring 2: recover tray 1, then rings 1/3 for trays 2/3. */
+				delay_ms(200);
+				fnwuliao1();
+				delay_ms(100);
+				zancun_na(1,500,1850*4,1);
+				fnwuliao2();
+				delay_ms(200);
+				zancun_na(2,500,3700*4,2);
+				fnwuliao3();
+				car(1,500,1850*4); /* From ring 3 back to center ring 2. */
+			}
+		}
+	}
+	
+	
 	
 	
 	

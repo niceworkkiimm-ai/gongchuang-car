@@ -3,7 +3,7 @@
 #include "usart.h"
 #include "gyro_debug.h"
 
-float anglea=0;
+volatile float anglea=0;
 /* Observation only: these values never select or stop motor commands. */
 volatile int16_t car_debug_mode = -1;
 volatile int16_t car_debug_target = 0;
@@ -13,15 +13,15 @@ int speed_add=150;
 
 extern volatile float global_angle;
 
-/* +180 and -180 are the same heading. The sensor never reports exact +180.
- * Use the untruncated yaw for a half-degree arrival window at this target.
- */
-#define CAR_HALF_TURN_TOLERANCE_DEG 0.5f
-static uint8_t Car_HalfTurnReached(void)
+/* Keep fractional yaw. Arrival uses the shortest wrapped angular error. */
+#define CAR_HEADING_TOLERANCE_DEG 0.5f
+static uint8_t Car_HeadingReached(float target)
 {
-    float yaw = global_angle;
-    return yaw >= 180.0f - CAR_HALF_TURN_TOLERANCE_DEG ||
-           yaw <= -180.0f + CAR_HALF_TURN_TOLERANCE_DEG;
+    float error = target - anglea;
+    if (error > 180.0f) error -= 360.0f;
+    else if (error < -180.0f) error += 360.0f;
+    return error >= -CAR_HEADING_TOLERANCE_DEG &&
+           error <= CAR_HEADING_TOLERANCE_DEG;
 }
 
 void car(dir,speed,location)
@@ -40,7 +40,8 @@ void car(dir,speed,location)
 	if (dir == 0)
 	{
 
-			if ((anglea < speed ) || ((anglea > speed) && (anglea >135)))
+			if (!Car_HeadingReached((float)speed) &&
+                ((anglea < speed) || ((anglea > speed) && (anglea >135))))
 			{
 				delay_ms(10);
 				Emm_V5_Vel_Control(1, 1, 10, 10,0);
@@ -52,7 +53,8 @@ void car(dir,speed,location)
 				Emm_V5_Vel_Control(4, 1, 10, 10,0);
 
 			}
-			if ((anglea > speed) || ((anglea < speed) && (anglea <-135)))
+			if (!Car_HeadingReached((float)speed) &&
+                ((anglea > speed) || ((anglea < speed) && (anglea <-135))))
 			{
 				delay_ms(10);
 				Emm_V5_Vel_Control(1, 0, 10, 10,0);
@@ -65,8 +67,7 @@ void car(dir,speed,location)
 
 			}
 		while (1){
-			if (anglea == speed || anglea == 180 || anglea == -180 ||
-                ((speed == 180 || speed == -180) && Car_HalfTurnReached()))
+			if (Car_HeadingReached((float)speed))
 			{
 				delay_ms(10);
 				Emm_V5_Stop_Now(1,0);

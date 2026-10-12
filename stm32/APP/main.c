@@ -29,7 +29,7 @@ volatile float angular_velocity_z = 0.0;
 volatile uint8_t new_data_received = 0;
 
 
-extern float anglea;
+extern volatile float anglea;
 /**********************************************************
 ***	Emm_V5.0步进闭环控制例程
 ***	编写作者：ZHANGDATOU
@@ -58,6 +58,16 @@ int main(void)
 	Usart_Init2();
 	SysTick_Init();
 	Scanner_DisplayInit();
+#if 1 /* SIMULATED_SCAN: set to 0 to use the real scanner. */
+    {
+        const char simulated_scan[] = "123+321+213+231";
+        uint32_t irq_mask = __get_PRIMASK();
+        __disable_irq();
+        memcpy(saoma_data, simulated_scan, sizeof(simulated_scan));
+        saoma_ready = 1;
+        __set_PRIMASK(irq_mask);
+    }
+#endif /* SIMULATED_SCAN */
 #if 0   // 1:????????;0:??????
 
     FSUS_ServoAngleReset(&usart2, 0); // ????????????
@@ -161,6 +171,14 @@ int main(void)
 	//yuanhuanceshi();
 	//ceshi6 ();
 	//for(; ;);
+	
+	//xingzou();
+	//for(; ;);
+	//car(2,500,4000);
+	//for(; ;);
+	
+	ceshi8();
+	for(; ;);
 	
 	yuanliao();
 	cujiagong();

@@ -69,12 +69,12 @@ float pid2(int16_t speed1,float tar1)//b
 
 
 
-int angle(float Angle,float Gyroy,float Mechanical_Angle)
+float angle(float Angle,float Gyroy,float Mechanical_Angle)
 {
 	float Kp = 1; //       
   float Kd = 0.1;//      
 	float Bias; //角度误差值
-	int balance_up; //直立环控制PWM
+	float balance_up; //直立环控制PWM
 	Bias=Angle-Mechanical_Angle; //角度误差值==测量的俯仰角-理想角度（机械平衡角度）
 	balance_up= Kp*Bias+ Kd*Gyroy; //计算平衡控制的电机PWM  PD控制   Up_balance_KP是P系数,Up_balance_KD是D系数
 	return balance_up;

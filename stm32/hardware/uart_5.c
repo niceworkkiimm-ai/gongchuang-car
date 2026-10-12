@@ -405,7 +405,7 @@ volatile uint8_t scanner_camera_tx_mode = 0;
 
 #if GYRO_OLED_DEBUG_ENABLE || CAMERA_OLED_DEBUG_ENABLE
 extern volatile float global_angle;
-extern float anglea;
+extern volatile float anglea;
 #define GYRO_DWT_CTRL   (*(volatile uint32_t *)0xE0001000UL)
 #define GYRO_DWT_CYCCNT (*(volatile uint32_t *)0xE0001004UL)
 static uint32_t gyro_oled_cycles;

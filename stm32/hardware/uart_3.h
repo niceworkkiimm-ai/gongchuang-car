@@ -5,7 +5,7 @@
 #include <stdint.h>
 void Usart3_Init(void);
 void Usart3_SendByte(uint8_t Byte);
-extern float anglea;
+extern volatile float anglea;
 void Usart3_SendString(char *String);
 void Usart3_SendArray(uint8_t *array, uint16_t length);
 

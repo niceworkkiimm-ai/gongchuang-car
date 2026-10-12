@@ -57,7 +57,7 @@ int main(void)
             current_ring = 2; count = 0;
             for (j = 1; j <= 3; ++j) trays[j] = cases[i][j - 1] - '0';
             place_at_temporary_zone();
-            assert(count == 3 && current_ring == cases[k][0] - '0');
+            assert(count == 3 && current_ring == 2);
             for (j = 0; j < 3; ++j) {
                 assert(trays[j + 1] == 0);
                 assert(rings[cases[k][j] - '0'] == cases[i][j] - '0');
@@ -65,7 +65,7 @@ int main(void)
             }
         }
     }
-    puts("PASS: all 36 scan combinations place trays 3/2/1 at scan[6]/[5]/[4] and leave materials there.");
+    puts("PASS: all 36 scan combinations place trays 3/2/1 at scan[6]/[5]/[4] and return to ring 2 while leaving materials there.");
     return 0;
 }
 '''
@@ -98,7 +98,7 @@ def main():
         r"(?m)(\t{4}fwuliao3\(\);)[\s\S]*?(?=^\t{3}\})",
         r"\1\n", coarse_action)
     assert removed == 6
-    assert re.sub(r"\s+", "", action) == re.sub(r"\s+", "", coarse_placement)
+    assert re.sub(r"\s+", "", action.split("/* Return to center ring 2 after the final placement")[0]) == re.sub(r"\s+", "", coarse_placement)
     assert "fnwuliao" not in action and "zancun_na" not in action
     assert "saoma_data[0]" not in action and "saoma_data[1]" not in action
     assert "saoma_data[2]" not in action

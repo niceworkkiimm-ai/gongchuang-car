@@ -128,7 +128,7 @@ static void run_case(const char *first_colors, const char *first_rings,
 
     phase = 1;
     second_stack_actions();
-    assert(stacked == 3 && current_ring == second_rings[2] - '0');
+    assert(stacked == 3 && current_ring == 2);
     for (i = 0; i < 3; ++i) {
         assert(!trays[i + 1]);
         assert(second_layer[i + 1] == first_layer[i + 1] - '0');
@@ -164,7 +164,7 @@ int main(void)
         assert(0); /* Missing same-color bases must not fall through to return. */
     }
     assert(stacked == 0 && current_ring == 2);
-    puts("PASS: 25920 six-color cases preserve coarse tray mapping, stack trays 3/2/1 on matching colors, and retain the old exit ring.");
+    puts("PASS: 25920 six-color cases preserve coarse tray mapping, stack trays 3/2/1 on matching colors, and return to center ring 2.");
     puts("PASS: missing same-color bases hold before stacking; task scan stays unchanged.");
     return 0;
 }

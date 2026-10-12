@@ -12,7 +12,7 @@ extern volatile uint8_t new_data_received;
 extern volatile float angular_velocity_y;
 extern volatile float angular_velocity_z;
 extern uint8_t received_data_packet[11];
-extern float anglea;
+extern volatile float anglea;
  
  
 //ÅäÖÃÃüÁîÊı×é
