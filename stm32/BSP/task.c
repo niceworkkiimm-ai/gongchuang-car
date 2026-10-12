@@ -1972,3 +1972,37 @@ void ceshi9(void)
             maduo1();
     }
 }
+
+/* Test only: place the car directly in front of physical temporary-zone ring 3.
+ * Its first layer must already be present, and the second-batch trays loaded.
+ * Stack the matching color once, return to ring 2, then run qidian().
+ */
+void ceshi10(void)
+{
+    int tray;
+    uint8_t ring_color = first_round_color_for_ring('3');
+    /* Keep this independent of the formal zancunqu2() camera center. */
+    const int stack_center_x = 150;
+    const int stack_center_y = 126;
+
+    if (ring_color < '1' || ring_color > '6')
+        while (1) delay_ms(1);
+
+    for (tray = 1; tray <= 3; ++tray)
+        if (saoma_data[7 + tray] == ring_color) break;
+    if (tray > 3)
+        while (1) delay_ms(1);
+
+    zhou(guiwei);
+    fuwei();
+    vision_at((char)(ring_color - '0'), stack_center_x, stack_center_y);
+    if (tray == 1)
+        maduo1();
+    else if (tray == 2)
+        maduo2();
+    else
+        maduo3();
+
+    car(1, 500, 1850 * 4); /* Physical ring 3 back to ring 2. */
+    qidian();
+}
