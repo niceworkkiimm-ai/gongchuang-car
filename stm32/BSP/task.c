@@ -562,8 +562,8 @@ void cujiagong()
 void zancunqu()
 {
     /* Same physical tray order as cujiagong: 3, 2, 1. */
-    const int ring_center_x = 175;
-    const int ring_center_y = 139;
+    const int ring_center_x = 140;
+    const int ring_center_y = 128;
 
 	/* Wang Kai route: inter-station travel. */
 	delay_ms(400);
@@ -1065,13 +1065,13 @@ void qidian()
 	//µ÷Õý
 	
 	delay_ms(100);
-	car(2,speed,11500*4);
+	car(2,speed,11450*4);
 	delay_ms(100);
 	car(6,speed,4450*4);
 	delay_ms(300);
-	car(0,90,0);
+	car(0,-90,0);
 	delay_ms(50);
-	car(2,speed,20000*4);
+	car(2,speed,22200*4);
 	delay_ms(50);
 	car(8,speed,4000*4);
 
