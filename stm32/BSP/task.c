@@ -1069,7 +1069,7 @@ void qidian()
 	delay_ms(100);
 	car(6,speed,4450*4);
 	delay_ms(300);
-	car(0,-90,0);
+	car(0,90,0);
 	delay_ms(50);
 	car(2,speed,22200*4);
 	delay_ms(50);
