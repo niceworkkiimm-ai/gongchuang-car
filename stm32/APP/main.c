@@ -177,8 +177,8 @@ int main(void)
 	//car(2,500,4000);
 	//for(; ;);
 	
-	ceshi8();
-	for(; ;);
+	//ceshi8();
+	//for(; ;);
 	
 	yuanliao();
 	cujiagong();

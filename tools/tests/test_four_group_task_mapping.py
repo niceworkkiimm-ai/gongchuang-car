@@ -46,8 +46,8 @@ static void vision(char mode)
 }
 static void vision_at(char mode, int center_x, int center_y)
 {
-    if (phase == 0) assert(center_x == 175 && center_y == 139);
-    else assert(center_x == 155 && center_y == 125);
+    if (phase == 0) assert(center_x == 140 && center_y == 128);
+    else assert(center_x == 150 && center_y == 126);
     vision(mode);
 }
 static void put_on_coarse_ring(int tray)
@@ -212,21 +212,24 @@ def main():
     for first_index, second_index in ((6, 14), (5, 13), (4, 12)):
         first_actions = first_actions.replace(
             f"saoma_data[{first_index}]", f"saoma_data[{second_index}]")
+    correction = "car(0,-90,0); /* Restore the coarse-area heading before returning. */"
+    assert first_actions.count(correction) == 2
+    first_actions = first_actions.replace(correction, "")
     assert re.sub(r"\s+", "", first_actions) == re.sub(r"\s+", "", coarse)
     first_coarse = function(source, "void cujiagong()")
     second_coarse = function(source, "void cujiagong2()")
     lift = "Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);"
     assert lift in first_coarse and lift in second_coarse
     assert second_coarse.index(lift) < second_coarse.index("delay_ms(650);")
-    assert "const int ring_center_x = 175;" in second_coarse
-    assert "const int ring_center_y = 139;" in second_coarse
+    assert "const int ring_center_x = 140;" in second_coarse
+    assert "const int ring_center_y = 128;" in second_coarse
     assert "vision('4');" not in coarse
     assert "vision('5');" not in coarse
     assert "vision('6');" not in coarse
     code = HARNESS.replace("/* INSERT_COLOR_LOOKUP */", lookup)
     code = code.replace("/* INSERT_COARSE_ACTIONS */",
                         "static void second_coarse_actions(void)\n{\n"
-                        "const int ring_center_x = 175, ring_center_y = 139;\n"
+                        "const int ring_center_x = 140, ring_center_y = 128;\n"
                         + coarse + "\n}")
     code = code.replace("/* INSERT_STACK_ACTIONS */",
                         "static void second_stack_actions(void)\n{\n"

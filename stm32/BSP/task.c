@@ -347,8 +347,8 @@ void yuanliao()
 void cujiagong()
 {
     /* First coarse-processing round only; pixel X grows right, Y grows down. */
-    const int ring_center_x = 175;
-    const int ring_center_y = 139;
+    const int ring_center_x = 140;
+    const int ring_center_y = 128;
 
 	/* Wang Kai route: inter-station travel. */
 	
@@ -521,6 +521,7 @@ void cujiagong()
 				delay_ms(200);
 				zancun_na(2,500,1850*4,2);
 				fnwuliao3();
+				car(0,-90,0); /* Restore the coarse-area heading before returning. */
 				car(1,500,1850*4); /* From ring 3 back to center ring 2. */
 			}
 		}
@@ -547,6 +548,7 @@ void cujiagong()
 				delay_ms(200);
 				zancun_na(2,500,3700*4,2);
 				fnwuliao3();
+				car(0,-90,0); /* Restore the coarse-area heading before returning. */
 				car(1,500,1850*4); /* From ring 3 back to center ring 2. */
 			}
 		}
@@ -754,8 +756,8 @@ void yuanliao2()
 
 void cujiagong2()
 {
-    const int ring_center_x = 175;
-    const int ring_center_y = 139;
+    const int ring_center_x = 140;
+    const int ring_center_y = 128;
 	/* Wang Kai route: inter-station travel. */
 	car(6,speed,4500*4);
 	delay_ms(300);
@@ -974,8 +976,8 @@ void zancunqu2()
     int target_rings[3] = {0, 0, 0};
     int exit_ring;
     /* Second-round stacking target in camera pixels: tune here only. */
-    const int stack_center_x = 155;
-    const int stack_center_y = 125;
+    const int stack_center_x = 150;
+    const int stack_center_y = 126;
 	/* Wang Kai route: inter-station travel. */
 	delay_ms(300);
 	car(0,-90,0);
@@ -1929,8 +1931,8 @@ void ceshi9(void)
     int current_ring = 2;
     int target_rings[3] = {0, 0, 0};
     /* Tune this test center independently; copy proven values to zancunqu2(). */
-    const int stack_center_x = 155;
-    const int stack_center_y = 125;
+    const int stack_center_x = 150;
+    const int stack_center_y = 126;
 
     zhou(guiwei);
     /* Map each second-batch tray color to its first-layer ring. */
