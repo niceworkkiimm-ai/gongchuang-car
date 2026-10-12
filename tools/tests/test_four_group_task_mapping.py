@@ -46,7 +46,8 @@ static void vision(char mode)
 }
 static void vision_at(char mode, int center_x, int center_y)
 {
-    assert(center_x == 175 && center_y == 139);
+    if (phase == 0) assert(center_x == 175 && center_y == 139);
+    else assert(center_x == 155 && center_y == 125);
     vision(mode);
 }
 static void put_on_coarse_ring(int tray)

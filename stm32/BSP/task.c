@@ -973,6 +973,9 @@ void zancunqu2()
     int current_ring = 2;
     int target_rings[3] = {0, 0, 0};
     int exit_ring;
+    /* Second-round stacking target in camera pixels: tune here only. */
+    const int stack_center_x = 155;
+    const int stack_center_y = 125;
 	/* Wang Kai route: inter-station travel. */
 	delay_ms(300);
 	car(0,-90,0);
@@ -1023,7 +1026,8 @@ void zancunqu2()
 
         fuwei();
         /* Raw modes 1..6 align to the same-color material in layer one. */
-        vision((char)(saoma_data[7 + tray] - '0'));
+        vision_at((char)(saoma_data[7 + tray] - '0'),
+                  stack_center_x, stack_center_y);
         if (tray == 3)
             maduo3();
         else if (tray == 2)
@@ -1715,8 +1719,8 @@ void ceshi8(void)
 {
 	
 	
-	const int ring_center_x = 143;
-	const int ring_center_y = 126;
+	const int ring_center_x = 140;
+	const int ring_center_y = 128;
 	
 	zhou(guiwei);   
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //Éý½µÌ¨½µ	
