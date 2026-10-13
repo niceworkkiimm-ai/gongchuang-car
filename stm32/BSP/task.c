@@ -11,6 +11,10 @@
 int speed_hua2=500;
 int speed_hua_jia2=200;
 int speed=500;
+/* dir10路段：原直行值保留为基准，减去圆弧占用的距离。
+ * 减一次TRIM=16998脉冲；两个弯之间的直行减两次。
+ * car(10,speed,0)为与dir6同向的90度弯；区域内原地转向仍用dir5/6。
+ */
 extern volatile float anglea;
 
 void zancun_na(dir,speed,location,WL){
@@ -295,23 +299,23 @@ void yuanliao()
 	delay_ms(300);
 	car(0,0,0);
 	delay_ms(50);
-	car(2,speed,11500*4);	//走到扫码区
+	car(2,speed,11500*4-CAR_ARC_90_TRIM_PULSES);	//走到扫码区
 	car(0,0,0);
 	delay_ms(50);
-	car(6,speed,4450*4);	//原地转弯
+	car(10,speed,0);	//弧线转弯
 	delay_ms(400);
 	car(0,-90,0);			//
 	delay_ms(50);
-	car(2,speed,11750*4);	//走到中心
+	car(2,speed,11750*4-2*CAR_ARC_90_TRIM_PULSES);	//走到中心
 	delay_ms(100);
-	car(6,speed,4450*4);	//原地转弯
+	car(10,speed,0);	//弧线转弯
 	delay_ms(400);
 	if (anglea<=180 && anglea>=0)
 		car(0,180,0);
 	else if( anglea>=-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(100);
-	car(2,speed,11250*4);
+	car(2,speed,11250*4-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(50);
 	
 	car(6,speed,4450*4);
@@ -364,7 +368,7 @@ void cujiagong()
 	
 	zhou(guiwei);   
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降	
-	delay_ms(650);
+	delay_ms(300);//gz
 
 	
 
@@ -569,16 +573,16 @@ void zancunqu()
 	delay_ms(400);
 	car(0,-90,0);
 	delay_ms(50);
-	car(2,speed,11000*4);
+	car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(50);
-	car(6,speed,4450*4);
+	car(10,speed,0);
 	delay_ms(400);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(100);
-	car(2,speed,11000*4);
+	car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(100);
 	zhou(guiwei);    //夹子正对物料
 	
@@ -715,18 +719,18 @@ void yuanliao2()
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(300);
-	car(2,speed,11750*4);
+	car(2,speed,11750*4-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(300);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(100);
-	car(6,speed,4450*4);
+	car(10,speed,0);
 	delay_ms(400);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,10750*4);
+	car(2,speed,10750*4-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(300);
 
 	zhuazikai();
@@ -982,16 +986,16 @@ void zancunqu2()
 	delay_ms(300);
 	car(0,-90,0);
 	delay_ms(50);
-	car(2,speed,11000*4);
+	car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(400);
-	car(6,speed,4450*4);
+	car(10,speed,0);
 	delay_ms(300);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(100);
-	car(2,speed,10000*4);
+	car(2,speed,10000*4-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(50);
 	zhou(guiwei);    //夹子正对物料
 
@@ -1065,13 +1069,13 @@ void qidian()
 	//调正
 	
 	delay_ms(100);
-	car(2,speed,11450*4);
+	car(2,speed,11450*4-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(100);
-	car(6,speed,4450*4);
+	car(10,speed,0);
 	delay_ms(300);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,22200*4);
+	car(2,speed,22200*4-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(50);
 	car(8,speed,4000*4);
 
@@ -1603,23 +1607,23 @@ void xingzou(void)
     delay_ms(300);
     car(0,0,0); // 调正到0度
     delay_ms(50);
-    car(2,speed,12000*4); // 走到扫码区；距离调12000*4（本测试不等待扫码）
+    car(2,speed,12000*4-CAR_ARC_90_TRIM_PULSES); // 走到扫码区；原直行基准调12000*4（本测试不等待扫码）
     car(0,0,0); // 调正到0度
     delay_ms(50);
-    car(6,speed,4450*4); // 扫码区后第一次原地转向；转向脉冲4450*4
+    car(10,speed,0); // 扫码区后第一次弧线转弯；两侧脉冲8900/44500，前后直线已补偿
     delay_ms(400);
     car(0,-90,0); // 调正到-90度
     delay_ms(50);
-    car(2,speed,11500*4); // 走向原料区方向的下一拐点；距离调11500*4
+    car(2,speed,11500*4-2*CAR_ARC_90_TRIM_PULSES); // 走向原料区方向的下一拐点；原直行基准调11500*4
     delay_ms(100);
-    car(6,speed,4450*4); // 第二次原地转向；转向脉冲4450*4
+    car(10,speed,0); // 第二次弧线转弯；两侧脉冲8900/44500，前后直线已补偿
     delay_ms(400);
     if (anglea<=180 && anglea>=0)
         car(0,180,0); // 调正到180度
     else if( anglea>=-180 && anglea <=0)
         car(0,-180,0); // 调正到-180度（与180度同一朝向）
     delay_ms(100);
-    car(2,speed,12000*4); // 走向原料区；距离调12000*4
+    car(2,speed,12000*4-CAR_ARC_90_TRIM_PULSES); // 走向原料区；原直行基准调12000*4
     delay_ms(50);
     car(6,speed,4450*4); // 到原料区前最后一次原地转向
     delay_ms(400);
@@ -1639,16 +1643,16 @@ void xingzou(void)
     delay_ms(400);
     car(0,-90,0); // 离开粗加工区前调正到-90度
     delay_ms(50);
-    car(2,speed,11500*4); // 走向暂存区方向的拐点；距离调11500*4
+    car(2,speed,11500*4-CAR_ARC_90_TRIM_PULSES); // 走向暂存区方向的拐点；原直行基准调11500*4
     delay_ms(50);
-    car(6,speed,4450*4); // 拐点原地转向
+    car(10,speed,0); // 拐点弧线转弯
     delay_ms(400);
     if (anglea<180 && anglea>=0)
         car(0,180,0); // 调正到180度
     else if( anglea>-180 && anglea <=0)
         car(0,-180,0); // 调正到-180度
     delay_ms(100);
-    car(2,speed,11000*4); // 走到第一轮暂存区；距离调11000*4
+    car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES); // 走到第一轮暂存区；原直行基准调11000*4
     delay_ms(100);
 
     /* 第4段：第一轮暂存区 -> 第二轮原料区。对应 yuanliao2()。 */
@@ -1658,18 +1662,18 @@ void xingzou(void)
     else if( anglea>-180 && anglea <=0)
         car(0,-180,0); // 离开暂存区前调正到-180度
     delay_ms(300);
-    car(2,speed,13000*4); // 走向第二轮原料区方向的拐点；距离调13000*4
+    car(2,speed,13000*4-CAR_ARC_90_TRIM_PULSES); // 走向第二轮原料区方向的拐点；原直行基准调13000*4
     delay_ms(300);
     if (anglea<180 && anglea>=0)
         car(0,180,0); // 转向前调正到180度
     else if( anglea>-180 && anglea <=0)
         car(0,-180,0); // 转向前调正到-180度
     delay_ms(100);
-    car(6,speed,4450*4); // 拐点原地转向
+    car(10,speed,0); // 拐点弧线转弯
     delay_ms(400);
     car(0,90,0); // 调正到90度
     delay_ms(50);
-    car(2,speed,11000*4); // 走到第二轮原料区；距离调11000*4
+    car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES); // 走到第二轮原料区；原直行基准调11000*4
     delay_ms(300);
 
     /* 第5段：第二轮原料区 -> 第二轮粗加工区。对应 cujiagong2()。 */
@@ -1686,16 +1690,16 @@ void xingzou(void)
     delay_ms(300);
     car(0,-90,0); // 离开粗加工区前调正到-90度
     delay_ms(50);
-    car(2,speed,11000*4); // 走向暂存区方向的拐点；距离调11000*4
+    car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES); // 走向暂存区方向的拐点；原直行基准调11000*4
     delay_ms(400);
-    car(6,speed,4450*4); // 拐点原地转向
+    car(10,speed,0); // 拐点弧线转弯
     delay_ms(300);
     if (anglea<180 && anglea>=0)
         car(0,180,0); // 调正到180度
     else if( anglea>-180 && anglea <=0)
         car(0,-180,0); // 调正到-180度
     delay_ms(100);
-    car(2,speed,10000*4); // 走到第二轮暂存区；距离调10000*4
+    car(2,speed,10000*4-CAR_ARC_90_TRIM_PULSES); // 走到第二轮暂存区；原直行基准调10000*4
     delay_ms(50);
 
     /* 第7段：第二轮暂存区 -> 返回起点。对应 qidian()。 */
@@ -1704,13 +1708,13 @@ void xingzou(void)
     else if( anglea>-180 && anglea <=0)
         car(0,-180,0); // 返程出发前调正到-180度
     delay_ms(100);
-    car(2,speed,11000*4); // 离开暂存区走向返程拐点；距离调11000*4
+    car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES); // 离开暂存区走向返程拐点；原直行基准调11000*4
     delay_ms(100);
-    car(6,speed,4450*4); // 返程拐点原地转向
+    car(10,speed,0); // 返程拐点弧线转弯
     delay_ms(300);
     car(0,90,0); // 调正到90度
     delay_ms(50);
-    car(2,speed,23000*4); // 走向起点入口；距离调23000*4
+    car(2,speed,23000*4-CAR_ARC_90_TRIM_PULSES); // 走向起点入口；原直行基准调23000*4
     delay_ms(50);
     car(8,speed,4000*4); // 最后斜走回起点；距离调4000*4
 }

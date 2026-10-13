@@ -28,4 +28,10 @@ void WheelReply_Begin(void);
 void WheelReply_Arm(uint8_t addr);
 void WheelReply_End(void);
 
+/* Sequential addressed motor-state reads (3A), used by dir10 only. */
+extern volatile uint8_t wheel_status_ready;
+extern volatile uint8_t wheel_status_flags;
+void WheelStatus_Begin(uint8_t addr);
+void WheelStatus_End(void);
+
 #endif

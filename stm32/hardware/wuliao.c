@@ -56,8 +56,8 @@ void wait(){
 
 void zhou(int angle)
 {
-    FSUS_SetServoAngleMTurnByVelocity(&usart2,0,angle,150,300,600,0,0);
-	delay_ms(2000);
+    FSUS_SetServoAngleMTurnByVelocity(&usart2,0,angle,450,300,600,0,0);
+	delay_ms(600);
 }
 
 void jiazi(int angle)
@@ -108,7 +108,7 @@ void wuliao1(void)
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 2500, 0, 0);        //升降台下降
 	//转盘高度降低增加300
-	delay_ms(650);
+	delay_ms(350);//gz
 		
 		jiazi(zhua);           //抓物料
 	
@@ -122,7 +122,7 @@ void wuliao1(void)
 		
 		Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 3500, 0, 0);    //升降台下降
 		
-	delay_ms(650);
+	delay_ms(350);
 	
 		jiazi(fang);     //放物料
 		
@@ -143,7 +143,7 @@ void wuliao2(void)
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 2500, 0, 0);        //升降台下降
 	
-	delay_ms(650);
+	delay_ms(350);
 		
 		jiazi(zhua);           //抓物料
 	
@@ -158,7 +158,7 @@ void wuliao2(void)
 		
 		Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 3500, 0, 0);    //升降台下降
 		
-	delay_ms(650);
+	delay_ms(350);
 	
 		jiazi(fang);     //放物料
 		
@@ -179,7 +179,7 @@ void wuliao3(void)
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 2500, 0, 0);        //升降台下降
 	
-	delay_ms(650);
+	delay_ms(350);
 		
 		jiazi(zhua);           //抓物料
 	
@@ -193,7 +193,7 @@ void wuliao3(void)
 		
 		Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 3500, 0, 0);    //升降台下降
 		
-	delay_ms(650);
+	delay_ms(350);
 	
 		jiazi(fang);     //放物料
 		
@@ -209,25 +209,25 @@ void wuliao3(void)
 void fwuliao1(void)
 {
 	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 8200, 0, 0);				//升回最高点
-	delay_ms(650);
+	delay_ms(350);//gz
 	
 	jiazi(fang);
 	zhou(fang3);             //转至物料1位置
 	delay_ms(50);
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 3500,0,0);    //升降台降
-	delay_ms(650);
+	delay_ms(350);
 	
 	
 	jiazi(zhua);      //抓物料1
 	Emm_V5_Pos_Control(5, 0, speed_hua_fang, speed_hua_jia_fang, 3500,0,0);    //升降台升
-	delay_ms(650);
+	delay_ms(350);
 	
 	zhou(guiwei);      //转回0位置
 		
 	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 12000,0,0);    //升降台降放地上
 	
-	delay_ms(1000);
+	delay_ms(800);
 		
 	jiazi2(fang);      //放物料1
 	
@@ -243,26 +243,26 @@ void fwuliao1(void)
 void fwuliao2(void)
 {
 	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 8200, 0, 0);	//升到最高处
-	delay_ms(650);
+	delay_ms(350);
 	jiazi(fang);
 	zhou(fang2);              //转至物料2位置
 	delay_ms(50);
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 3500, 0, 0);        //升降台降
 	
-	delay_ms(650);
+	delay_ms(350);
 		 
 		jiazi(zhua);         //抓物料2
 		
 	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 3500, 0, 0);            //升降台升
 	
-	delay_ms(650);
+	delay_ms(350);
 	
 		zhou(guiwei);       //转回0位置
 		
 	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 12000, 0, 0);           //升降台降放地上
 	
-	delay_ms(1000);
+	delay_ms(800);
 		
 	jiazi2(fang);        //放物料2
 	
@@ -279,26 +279,26 @@ void fwuliao3(void)
 {
 	
 	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 8200, 0, 0);
-	delay_ms(650);
+	delay_ms(350);
 	jiazi(fang);
 	zhou(fang1);           //转至物料3位置
 
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 3500, 0, 0);        //升降台降
 	
-	delay_ms(650);
+	delay_ms(350);
 		
 		jiazi(zhua);                //抓物料2
 		
 	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 3500, 0, 0);             //升降台升
 	
-	delay_ms(650);
+	delay_ms(350);
 	
 		zhou(guiwei);           //转回0位置
 		
 	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 12000, 0, 0);         //升降台降
 	
-	delay_ms(1000);
+	delay_ms(800);
 		
 	jiazi2(fang);        //放物料3
 	
@@ -419,13 +419,13 @@ void maduo1(void)
 	
 	zhou(guiwei);       //转回0位置
 	
-	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 5500, 0, 0);     //升降台降
+	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 5700, 0, 0);     //升降台降
 	
 	delay_ms(650);
 	
 	jiazi(fang);	    //放物料1
 		
-	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 5500, 0, 0);    //升降台升
+	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 5700, 0, 0);    //升降台升
 	
 	delay_ms(200);
 	
@@ -449,13 +449,13 @@ void maduo2(void)
 	
 	zhou(guiwei);       //转回0位置
 	
-	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 5500, 0, 0);     //升降台降
+	Emm_V5_Pos_Control(5, 1, speed_hua_fang, speed_hua_jia_fang, 5700, 0, 0);     //升降台降
 	
 	delay_ms(650);
 	
 	jiazi(fang);	    //放物料1
 		
-	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 5500, 0, 0);    //升降台升
+	Emm_V5_Pos_Control(5, 0, speed_hua, speed_hua_jia, 5700, 0, 0);    //升降台升
 	
 	delay_ms(200);
 	

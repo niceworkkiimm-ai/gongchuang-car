@@ -111,6 +111,52 @@ static void WheelReply_RxError(void)
     }
 }
 
+/* Addressed 3A queries for dir10. Independent of legacy FD completion data. */
+volatile uint8_t wheel_status_ready = 0;
+volatile uint8_t wheel_status_flags = 0;
+static volatile uint8_t wheel_status_addr = 0;
+static uint8_t wheel_status_bytes[4];
+static uint8_t wheel_status_count = 0;
+
+void WheelStatus_Begin(uint8_t addr)
+{
+    uint32_t mask = __get_PRIMASK();
+    __disable_irq();
+    wheel_status_ready = 0;
+    wheel_status_flags = 0;
+    wheel_status_count = 0;
+    wheel_status_addr = (addr >= 1 && addr <= 4) ? addr : 0;
+    __set_PRIMASK(mask);
+}
+
+void WheelStatus_End(void)
+{
+    uint32_t mask = __get_PRIMASK();
+    __disable_irq();
+    wheel_status_addr = 0;
+    wheel_status_count = 0;
+    __set_PRIMASK(mask);
+}
+
+static void WheelStatus_Feed(uint8_t data)
+{
+    if (!wheel_status_addr || wheel_status_ready) return;
+    wheel_status_bytes[wheel_status_count++] = data;
+    if (wheel_status_count < 4) return;
+    if (wheel_status_bytes[0] == wheel_status_addr &&
+        wheel_status_bytes[1] == 0x3A && wheel_status_bytes[3] == 0x6B)
+    {
+        wheel_status_flags = wheel_status_bytes[2];
+        wheel_status_ready = 1;
+        wheel_status_count = 0;
+        return;
+    }
+    wheel_status_bytes[0] = wheel_status_bytes[1];
+    wheel_status_bytes[1] = wheel_status_bytes[2];
+    wheel_status_bytes[2] = wheel_status_bytes[3];
+    wheel_status_count = 3;
+}
+
 void USART1_IRQHandler(void)
 {
 	__IO uint16_t i = 0;
@@ -127,9 +173,15 @@ void USART1_IRQHandler(void)
         data = (uint8_t)USART1->DR;
         fifo_enQueue(data);
         if (sr & (USART_FLAG_ORE | USART_FLAG_NE | USART_FLAG_FE | USART_FLAG_PE))
+        {
             WheelReply_RxError();
+            wheel_status_count = 0;
+        }
         else
+        {
             WheelReply_Feed(data);
+            WheelStatus_Feed(data);
+        }
 
 		// 清除串口接收中断
 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
