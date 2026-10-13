@@ -108,7 +108,7 @@ void wuliao1(void)
 	
 	Emm_V5_Pos_Control(5, 1, speed_hua, speed_hua_jia, 2500, 0, 0);        //升降台下降
 	//转盘高度降低增加300
-	delay_ms(350);//gz
+	delay_ms(250);//gz
 		
 		jiazi(zhua);           //抓物料
 	

@@ -299,7 +299,7 @@ void yuanliao()
 	delay_ms(300);
 	car(0,0,0);
 	delay_ms(50);
-	car(13,speed,11500*4-CAR_ARC_90_TRIM_PULSES); // 直行->转弯->直行到中心，不在转弯出口停车
+	car(12,speed,11500*4-CAR_ARC_90_TRIM_PULSES); // 统一四轮控制：直行->转弯->保留100ms稳定->直行到中心
 	// 后直行距离在car.h的CAR_DIR13_AFTER_PULSES调整。
 	// 原dir12、car(0,-90,0)、50ms等待和下一段dir2均已包含/替换，不再重复调用。
 	delay_ms(100);

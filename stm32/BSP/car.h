@@ -16,14 +16,20 @@
 #define CAR_ARC_90_TRIM_PULSES ((int)(CAR_ARC_90_CENTER_PULSES * 0.63661977236758134308 + 0.5))
 
 /* dir13：前直行距离由car第三参数传入；后直行和转向在这里调。
- * 2/4外侧轮在转弯期间保持速度运动；用现有陀螺仪判断转向量。
+ * 前段/转弯四轮统一速度模式；前段用电机位置反馈测距，转弯用陀螺仪。
  */
 #define CAR_DIR13_INNER_PULSES       (2225L * 4L)
+/* 2225:9000只决定转弯速度比例，不再给单侧轮子下位置终点。 */
+#define CAR_DIR13_OUTER_PULSES       (9000L * 4L)
+/* Emm默认1.8度、16细分的串口脉冲单位：一圈3200脉冲。 */
+#define CAR_DIR13_PULSES_PER_REV     3200UL
+#define CAR_DIR13_TURN_ACC           235
+#define CAR_DIR13_EXIT_SETTLE_MS     100
 #define CAR_DIR13_AFTER_PULSES       (11750L * 4L - 2L * CAR_ARC_90_TRIM_PULSES)
 #define CAR_DIR13_TURN_DEG           90.0f
 #define CAR_DIR13_GYRO_TIMEOUT_MS    500UL
 #define CAR_DIR13_MOVE_TIMEOUT_MS    12000UL
-/* phase: 1=直行转弯，2=后直行，3=结束，255=停止；error见car.c。 */
+/* phase: 1=前直行，2=转弯，3=后直行，4=完成，255=停止；error见car.c。 */
 extern volatile uint8_t car13_phase;
 extern volatile uint8_t car13_error;
 
