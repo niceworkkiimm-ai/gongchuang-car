@@ -13,7 +13,7 @@ int speed_hua_jia2=200;
 int speed=500;
 /* dir10路段：原直行值保留为基准，减去圆弧占用的距离。
  * 减一次TRIM=16998脉冲；两个弯之间的直行减两次。
- * car(10,speed,0)为与dir6同向的90度弯；区域内原地转向仍用dir5/6。
+ * car(10,speed,0)沿用原执行逻辑，脉冲按dir6标定换算；直线补偿需试车校验。
  */
 extern volatile float anglea;
 
