@@ -56,8 +56,8 @@ void wait(){
 
 void zhou(int angle)
 {
-    FSUS_SetServoAngleMTurnByVelocity(&usart2,0,angle,450,300,300,0,0);
-	delay_ms(500);
+    FSUS_SetServoAngleMTurnByVelocity(&usart2,0,angle,150,300,600,0,0);
+	delay_ms(2000);
 }
 
 void jiazi(int angle)
