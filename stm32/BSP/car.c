@@ -122,7 +122,7 @@ void car(dir,speed,location)
 		{
 			if (rxCmd[1] == 0xFD && rxCmd[2] == 0x9F && rxCmd [3] == 0x6B)
 			{	
-				delay_ms(20);
+				//delay_ms(20);
 				break;
 		}
 			Gyro_DisplayPoll(); /* Keep OLED live while waiting. */
@@ -392,11 +392,11 @@ void car(dir,speed,location)
 	{
 		Emm_V5_Pos_Control(1, 1, 500, 150, 2225*4, 0, 0);
 		delay_ms(10);
-		Emm_V5_Pos_Control(2, 0, 500, 150, 11125*4, 0, 0);
+		Emm_V5_Pos_Control(2, 0, 500, 150, 9000*4, 0, 0);
 		delay_ms(10);
 		Emm_V5_Pos_Control(3, 1, 500, 150, 2225*4, 0, 0);
 		delay_ms(10);
-		Emm_V5_Pos_Control(4, 0, 500, 150, 11125*4, 0, 0);
+		Emm_V5_Pos_Control(4, 0, 500, 150, 9000*4, 0, 0);
 		while(1)
 		{
 			if (rxCmd[1] == 0xFD && rxCmd[2] == 0x9F && rxCmd [3] == 0x6B)
@@ -427,5 +427,28 @@ void car(dir,speed,location)
 			Gyro_DisplayPoll(); /* Keep OLED live while waiting. */
 		}
 	}
+    if (dir == 12) /* 直行+原dir10转弯合为一条位置指令，中间不等到位。 */
+    {
+        /* location只填直行脉冲；两侧再分别加当前dir10的转弯脉冲。
+         * 1/3轮附加2225*4，2/4轮附加9000*4；方向沿用dir2和dir10。
+         * 同速执行，不是恒定半径圆弧；保留原发送间隔和到位判断。
+         */
+        Emm_V5_Pos_Control(1, 1, speed, 150, location + 2225*4, 0, 0);
+        delay_ms(10);
+        Emm_V5_Pos_Control(2, 0, speed, 150, location + 9000*4, 0, 0);
+        delay_ms(10);
+        Emm_V5_Pos_Control(3, 1, speed, 150, location + 2225*4, 0, 0);
+        delay_ms(10);
+        Emm_V5_Pos_Control(4, 0, speed, 150, location + 9000*4, 0, 0);
+        while (1)
+        {
+            if (rxCmd[1] == 0xFD && rxCmd[2] == 0x9F && rxCmd[3] == 0x6B)
+            {
+                delay_ms(20);
+                break;
+            }
+            Gyro_DisplayPoll();
+        }
+    }
     car_debug_active = 0;
 }

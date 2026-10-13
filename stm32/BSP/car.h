@@ -15,6 +15,7 @@
 /* 既有直线补偿基准16998脉冲；两弯共用直线扣两次，实际轨迹需试车调距。 */
 #define CAR_ARC_90_TRIM_PULSES ((int)(CAR_ARC_90_CENTER_PULSES * 0.63661977236758134308 + 0.5))
 
+/* dir12: location=直行脉冲，内部再加2225*4/9000*4的转弯脉冲。 */
 void car(int dir,int speed,int location);
 void MoveForwardAndRotate(float location);
 #endif

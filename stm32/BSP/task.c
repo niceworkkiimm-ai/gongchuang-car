@@ -299,11 +299,11 @@ void yuanliao()
 	delay_ms(300);
 	car(0,0,0);
 	delay_ms(50);
-	car(2,speed,11500*4-CAR_ARC_90_TRIM_PULSES);	//走到扫码区
-	car(0,0,0);
-	delay_ms(50);
-	car(10,speed,0);	//弧线转弯
-	delay_ms(400);
+	car(12,speed,11500*4-CAR_ARC_90_TRIM_PULSES); // 直行到扫码区并接转弯，合为一次运动
+	//car(0,0,0);
+	//delay_ms(200);
+	// 原car(10,speed,0)已包含在dir12中，不再重复执行。
+	//delay_ms(400);
 	car(0,-90,0);			//
 	delay_ms(50);
 	car(2,speed,11750*4-2*CAR_ARC_90_TRIM_PULSES);	//走到中心
