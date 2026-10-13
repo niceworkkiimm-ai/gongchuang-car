@@ -13,24 +13,16 @@ extern volatile float angular_velocity_y;
 extern volatile float angular_velocity_z;
 extern uint8_t received_data_packet[11];
 extern volatile float anglea;
- 
- 
-//配置命令数组
-//解锁寄存器 FF AA 69 88 B5
-//Z轴角度归零FF AA 76 00 00
-//设置200HZ输出 FF AA 03 0B 00
-//设置波特率115200 FF AA 04 06 00
-//保存 FF AA 00 00 00
-//重启 FF AA 00 FF 00
-uint8_t unlock_register[] = {0xFF, 0xAA, 0x69, 0x88, 0xB5};
-uint8_t reset_z_axis[] = {0xFF, 0xAA, 0x76, 0x00, 0x00};
-uint8_t set_output_200Hz[] = {0xFF, 0xAA, 0x03, 0x0B, 0x00};
-uint8_t set_baudrate_115200[] = {0xFF, 0xAA, 0x04, 0x06, 0x00};
-uint8_t save_settings[] = {0xFF, 0xAA, 0x00, 0x00, 0x00};
-uint8_t restart_device[] = {0xFF, 0xAA, 0x00, 0xFF, 0x00};
- 
- 
- 
+
+/* 单轴陀螺仪：115200/8N1，5A AA 角速度，5A BB 航向角。 */
+static uint8_t unlock_register[] = {0x55, 0xAA, 0x13, 0x8E, 0x5F};
+static uint8_t reset_z_axis[] = {0x55, 0xAA, 0x15, 0x00, 0x00};
+static uint8_t set_output_200Hz[] = {0x55, 0xAA, 0x02, 0x0B, 0x00};
+static uint8_t save_settings[] = {0x55, 0xAA, 0x00, 0x00, 0x00};
+#define GYRO_FRAME_LENGTH 5U
+static uint8_t gyro_rx_buffer[GYRO_FRAME_LENGTH];
+static uint8_t gyro_rx_count;
+
 void Usart3_Init(void) 
 {
     /*开启时钟*/
@@ -79,16 +71,19 @@ void Usart3_Init(void)
 	
 	    // 发送配置命令
 		
+    /* 上电后保持车身静止；手册启动时间为500ms，预留600ms。 */
+    delay_ms(600);
     Usart3_SendArray(unlock_register, sizeof(unlock_register));
-		delay_ms(400);
-    Usart3_SendArray(reset_z_axis, sizeof(reset_z_axis));
+    delay_ms(100);
     Usart3_SendArray(set_output_200Hz, sizeof(set_output_200Hz));
-    Usart3_SendArray(set_baudrate_115200, sizeof(set_baudrate_115200));
+    delay_ms(100);
+    Usart3_SendArray(reset_z_axis, sizeof(reset_z_axis));
+    delay_ms(100);
     Usart3_SendArray(save_settings, sizeof(save_settings));
-    Usart3_SendArray(restart_device, sizeof(restart_device));
-	
+    delay_ms(100);
+    /* 默认波特率已是115200；保存后直接接收，不额外重启模块。 */
 }
- 
+
 void Usart3_SendByte(uint8_t Byte) {
     USART_SendData(USART3, Byte); //将字节数据写入数据寄存器，写入后USART自动生成时序波形
     while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET); //等待发送完成
@@ -111,93 +106,94 @@ void Usart3_Printf(char *format, ...) {
     Usart3_SendString(String); //串口发送字符数组（字符串）
 }
  
-void Usart3_SendArray(uint8_t *array, uint16_t length) 
-	{
-    for (uint16_t i = 0; i < length; i++) {
+void Usart3_SendArray(uint8_t *array, uint16_t length)
+{
+    uint16_t i;
+    /* 二进制命令严格按长度发送，不追加回车、换行。 */
+    for (i = 0; i < length; ++i)
         Usart3_SendByte(array[i]);
-    }
-    Usart3_SendByte(0x0D); // 发送回车符
-    Usart3_SendByte(0x0A); // 发送换行符
-		delay_ms(200);
-	
+    while (USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
 }
- 
- 
-void USART3_IRQHandler(void) {
-    static uint8_t rx_buffer[11];
-    static uint8_t rx_index = 0;
-    static uint8_t state = 0; // 0: 寻找包头，1: 接收数据
- 
-    if (USART_GetITStatus(USART3, USART_IT_RXNE) != RESET) {
-        uint8_t data = USART_ReceiveData(USART3);
- 
-        if (state == 0) { // 寻找包头
-            if (data == 0x55) {
-                rx_buffer[0] = data;
-                rx_index = 1;
-                state = 1;
-            }
-        } else if (state == 1) { // 接收数据
-            rx_buffer[rx_index++] = data;
-            if (rx_index == 2 && rx_buffer[1] != 0x53 && rx_buffer[1] != 0x52) { // 如果第二字节不是0x53或0x52，则继续寻找下一个0x55
-                if (rx_buffer[1] == 0x55) {
-                    rx_index = 1;
-                } else {
-                    state = 0;
-                    rx_index = 0;
-                }
-            } else if (rx_index == 11) { // 接收到了完整的数据包
-                ParseAndPrintData(rx_buffer, 11);
-                rx_index = 0;
-                state = 0; // 重新寻找包头
-            }
-        }
- 
-        USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+
+static uint8_t Gyro_FrameValid(uint8_t *data, uint16_t length)
+{
+    if (length != GYRO_FRAME_LENGTH || data[0] != 0x5A)
+        return 0;
+    if (data[1] != 0xAA && data[1] != 0xBB)
+        return 0;
+    return CalculateChecksum(data, GYRO_FRAME_LENGTH - 1U, data[1]) == data[4];
+}
+
+static void Gyro_ReceiveByte(uint8_t data)
+{
+    uint8_t i;
+    if (gyro_rx_count == 0 && data != 0x5A)
+        return;
+    gyro_rx_buffer[gyro_rx_count++] = data;
+    if (gyro_rx_count < GYRO_FRAME_LENGTH)
+        return;
+
+    if (Gyro_FrameValid(gyro_rx_buffer, GYRO_FRAME_LENGTH))
+    {
+        ParseAndPrintData(gyro_rx_buffer, GYRO_FRAME_LENGTH);
+        gyro_rx_count = 0;
+    }
+    else
+    {
+        /* 错帧滑动一字节重新找头，保留可能已收到的下一帧开头。 */
+        for (i = 1; i < GYRO_FRAME_LENGTH; ++i)
+            gyro_rx_buffer[i - 1U] = gyro_rx_buffer[i];
+        gyro_rx_count = GYRO_FRAME_LENGTH - 1U;
     }
 }
- 
-void ParseAndPrintData(uint8_t *data, uint16_t length) {
-    if (length == 11) {
-        uint8_t checksum = CalculateChecksum(data, length - 1, data[1]);
-        if (checksum != data[length - 1]) {
-//            Usart3_Printf("Checksum error\r\n");
+
+void USART3_IRQHandler(void)
+{
+    uint16_t status = USART3->SR;
+    uint8_t data;
+    if (status & (USART_SR_RXNE | USART_SR_ORE | USART_SR_FE |
+                  USART_SR_NE | USART_SR_PE))
+    {
+        /* 先读SR再读DR，清除接收及错误状态；不使用出错字节。 */
+        data = (uint8_t)USART3->DR;
+        if (status & (USART_SR_ORE | USART_SR_FE | USART_SR_NE | USART_SR_PE))
+        {
+            gyro_rx_count = 0;
             return;
         }
- 
-        if (data[0] == 0x55 && data[1] == 0x53) {
-            // 数据部分从索引 6 开始，低字节在前，高字节在后
-            uint8_t yaw_l = data[6];
-            uint8_t yaw_h = data[7];
-            int16_t yaw = (int16_t)((yaw_h << 8) | yaw_l);
- 
-            // 将解析后的整数值转换为角度
-            float angle = ((float)yaw / 32768.0) * 180.0;
-            global_angle = angle;
-            ++gyro_yaw_frame_count; /* Count checksum-valid yaw packets only. */
-            new_data_received = 1;
-        } else if (data[0] == 0x55 && data[1] == 0x52) {
-            // 解析角速度数据
-            uint8_t wy_l = data[4];
-            uint8_t wy_h = data[5];
-            int16_t wy = (int16_t)((wy_h << 8) | wy_l);
-            angular_velocity_y = ((float)wy / 32768.0) * 2000.0;
- 
-            uint8_t wz_l = data[6];
-            uint8_t wz_h = data[7];
-            int16_t wz = (int16_t)((wz_h << 8) | wz_l);
-            angular_velocity_z = ((float)wz / 32768.0) * 2000.0;
- 
-            new_data_received = 1;
-        }
+        Gyro_ReceiveByte(data);
     }
 }
- 
-uint8_t CalculateChecksum(uint8_t *data, uint16_t length, uint8_t type) 
+
+void ParseAndPrintData(uint8_t *data, uint16_t length)
 {
-    uint8_t checksum = 0;
-    for (uint16_t i = 0; i < length; i++) {
-        checksum += data[i];
+    int16_t raw;
+    float yaw;
+    if (!Gyro_FrameValid(data, length))
+        return;
+    raw = (int16_t)(((uint16_t)data[3] << 8) | data[2]);
+
+    if (data[1] == 0xBB)
+    {
+        yaw = GYRO_YAW_DIRECTION * (float)raw / 32768.0f * 180.0f;
+        if (yaw >= 180.0f) yaw -= 360.0f;
+        else if (yaw < -180.0f) yaw += 360.0f;
+        global_angle = yaw;
+        ++gyro_yaw_frame_count;
     }
+    else
+    {
+        angular_velocity_z = GYRO_YAW_DIRECTION * (float)raw / 32768.0f * 2000.0f;
+    }
+    new_data_received = 1;
+}
+
+uint8_t CalculateChecksum(uint8_t *data, uint16_t length, uint8_t type)
+{
+    uint16_t i;
+    uint8_t checksum = 0;
+    (void)type;
+    for (i = 0; i < length; ++i)
+        checksum = (uint8_t)(checksum + data[i]);
     return checksum;
 }

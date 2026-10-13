@@ -36,13 +36,13 @@ void zancun_na(dir,speed,location,WL){
 		
 		delay_ms(200);
 		
-		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 4550, 0, 0);    //升降台下降
+		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 3500, 0, 0);    //升降台下降
 		
 	delay_ms(650);
 	
 		jiazi(fang);     //将物料2放进托盘
 		
-		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 4550, 0, 0);      //升降台上升
+		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 3500, 0, 0);      //升降台上升
 	
 	delay_ms(250);
 		
@@ -79,13 +79,13 @@ void zancun_na(dir,speed,location,WL){
 		else if (WL == 2)
 			zhou(zhua2);
 		
-		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 4550, 0, 0);    //升降台下降
+		Emm_V5_Pos_Control(5, 1, speed_hua2, speed_hua_jia2, 3500, 0, 0);    //升降台下降
 		
 	 delay_ms(650);
 	
 		jiazi(fang);     //将物料2放进托盘
 		
-		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 4550, 0, 0);      //升降台上升
+		Emm_V5_Pos_Control(5, 0, speed_hua2, speed_hua_jia2, 3500, 0, 0);      //升降台上升
 	
 	delay_ms(250);
 		
