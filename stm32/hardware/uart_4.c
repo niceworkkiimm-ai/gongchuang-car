@@ -185,7 +185,7 @@ void Usart_SendByte4(USART_TypeDef *pUSARTx, uint8_t ch)
             mode = (uint8_t)(ch - '7' + 1);
             legacy = (uint8_t)(0xA4 + ch - '7');
         }
-        if (mode > 7) return;
+        if (mode > 7 && (mode < 11 || mode > 16)) return;
         mask = __get_PRIMASK();
         __disable_irq();
         legacy_material_status = legacy;
@@ -193,7 +193,7 @@ void Usart_SendByte4(USART_TypeDef *pUSARTx, uint8_t ch)
         camera_count = 0;
         maixcam_mode = mode;
         __set_PRIMASK(mask);
-        ch = mode; /* raw numeric byte 00..07, not ASCII */
+        ch = mode; /* raw numeric byte 00..07 or 0B..10, not ASCII */
     }
 
     /* 发送一个字节数据到USART */

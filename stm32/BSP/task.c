@@ -1032,8 +1032,8 @@ void zancunqu2()
         current_ring = ring;
 
         fuwei();
-        /* Raw modes 1..6 align to the same-color material in layer one. */
-        vision_at((char)(saoma_data[7 + tray] - '0'),
+        /* Stacking colors 1..6 use raw camera modes 11..16 (0x0B..0x10). */
+        vision_at((char)(saoma_data[7 + tray] - '0' + 10),
                   stack_center_x, stack_center_y);
         if (tray == 3)
             maduo3();
