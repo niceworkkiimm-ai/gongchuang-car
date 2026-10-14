@@ -299,38 +299,35 @@ void yuanliao()
 	delay_ms(300);
 	car(0,0,0);
 	delay_ms(50);
-	car(12,speed,11500*4-CAR_ARC_90_TRIM_PULSES); // 直行到扫码区并接转弯，合为一次运动
+	car(2,speed,52000);
+	delay_ms(100);
+	car(13,speed,51000-CAR_ARC_90_TRIM_PULSES); // 直行到扫码区并接转弯，合为一次运动
 	//car(0,0,0);
 	//delay_ms(200);
 	// 原car(10,speed,0)已包含在dir12中，不再重复执行。
 	//delay_ms(400);
-	car(0,-90,0);			//
-	delay_ms(50);
-	car(2,speed,11750*4-2*CAR_ARC_90_TRIM_PULSES);	//走到中心
 	delay_ms(100);
-	car(10,speed,0);	//弧线转弯
-	delay_ms(400);
-	if (anglea<=180 && anglea>=0)
-		car(0,180,0);
-	else if( anglea>=-180 && anglea <=0)
-		car(0,-180,0);
+	car(0,90,0);			//
 	delay_ms(100);
-	car(2,speed,11250*4-CAR_ARC_90_TRIM_PULSES);
-	delay_ms(50);
-	
-	car(6,speed,4450*4);
-	delay_ms(400);
+	car(1,speed,32000);	//走到中心
+	delay_ms(100);
 	car(0,90,0);
-	delay_ms(100);		//转到物料区
+	delay_ms(100);
+	
 
 	zhuazikai();
 	zhuanpan0();
-	delay_ms(300);
+	delay_ms(100);
 	fuwei();
+	
+	
 	
 	Scanner_WaitForData(); // 行走中持续接收扫码，到此还未收到则等待
 	WL_dingwei(saoma_data[0]);
 	delay_ms(50);
+	
+	
+	
 	wuliao1();
 	fuwei();
 	
@@ -355,20 +352,18 @@ void cujiagong()
     const int ring_center_y = 128;
 
 	/* Wang Kai route: inter-station travel. */
-	
-	car(5,speed,4450*4);
-	delay_ms(400);
-	
-	car(1,speed,11000*8);
-	delay_ms(1000);
-
-	car(5,speed,4450*4);
+	car(6,speed,4500*4);
 	delay_ms(200);
-	car(0,-90,0);
-	
-	zhou(guiwei);   
-	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降	
-	delay_ms(300);//gz
+	car(0,0,0);
+	car(2,speed,22000*4);
+	delay_ms(50);
+	zhou(guiwei);    //夹子正对物料
+	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降
+	delay_ms(350);
+	car(6,speed,4450*4);
+	delay_ms(200);
+	car(0,-90,0);	
+	delay_ms(200);//gz
 
 	
 
@@ -568,22 +563,36 @@ void zancunqu()
     /* Same physical tray order as cujiagong: 3, 2, 1. */
     const int ring_center_x = 140;
     const int ring_center_y = 128;
-
-	/* Wang Kai route: inter-station travel. */
-	delay_ms(400);
+	
+	
 	car(0,-90,0);
+	delay_ms(200);
+	
+	car(12,speed,42000-CAR_ARC_90_TRIM_PULSES); 
 	delay_ms(50);
-	car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES);
-	delay_ms(50);
-	car(10,speed,0);
-	delay_ms(400);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
-	delay_ms(100);
-	car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES);
-	delay_ms(100);
+	car(2,speed,16000*2); 
+	delay_ms(300);
+	
+
+//	/* Wang Kai route: inter-station travel. */
+//	delay_ms(400);
+//	car(0,-90,0);
+//	delay_ms(50);
+//	car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES);
+//	delay_ms(50);
+//	car(10,speed,0);
+//	delay_ms(400);
+//	if (anglea<180 && anglea>=0)
+//		car(0,180,0);
+//	else if( anglea>-180 && anglea <=0)
+//		car(0,-180,0);
+//	delay_ms(100);
+//	car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES);
+//	delay_ms(100);
 	zhou(guiwei);    //夹子正对物料
 	
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);
@@ -719,18 +728,11 @@ void yuanliao2()
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(300);
-	car(2,speed,11750*4-CAR_ARC_90_TRIM_PULSES);
-	delay_ms(300);
-	if (anglea<180 && anglea>=0)
-		car(0,180,0);
-	else if( anglea>-180 && anglea <=0)
-		car(0,-180,0);
-	delay_ms(100);
-	car(10,speed,0);
-	delay_ms(400);
+	car(12,speed,42000-CAR_ARC_90_TRIM_PULSES);
+	delay_ms(50);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,10750*4-CAR_ARC_90_TRIM_PULSES);
+	car(2,speed,32000);
 	delay_ms(300);
 
 	zhuazikai();
@@ -983,20 +985,19 @@ void zancunqu2()
     const int stack_center_x = 150;
     const int stack_center_y = 126;
 	/* Wang Kai route: inter-station travel. */
-	delay_ms(300);
 	car(0,-90,0);
+	delay_ms(200);
+	
+	car(12,speed,42000-CAR_ARC_90_TRIM_PULSES); 
 	delay_ms(50);
-	car(2,speed,11000*4-CAR_ARC_90_TRIM_PULSES);
-	delay_ms(400);
-	car(10,speed,0);
-	delay_ms(300);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
-	delay_ms(100);
-	car(2,speed,10000*4-CAR_ARC_90_TRIM_PULSES);
-	delay_ms(50);
+	car(2,speed,16000*2); 
+	delay_ms(300);
+	
+
 	zhou(guiwei);    //夹子正对物料
 
 		//***********放物料*************
@@ -1053,29 +1054,29 @@ void zancunqu2()
 void qidian()
 {
 	/* Wang Kai route: inter-station travel. */
-	if (saoma_data[14] == '1'){
-		delay_ms(350);
-		zhou(fang1);
-	}
-	else if (saoma_data[14] == '2'){
-		delay_ms(350);
-		zhou(fang1);
-	}
-	else if (saoma_data[14] == '3'){
-		delay_ms(350);
-		zhou(fang1);
-	}
-	
+//	if (saoma_data[14] == '1'){
+//		delay_ms(350);
+//		zhou(fang1);
+//	}
+//	else if (saoma_data[14] == '2'){
+//		delay_ms(350);
+//		zhou(fang1);
+//	}
+//	else if (saoma_data[14] == '3'){
+//		delay_ms(350);
+//		zhou(fang1);
+//	}
+//	
 	//调正
 	
 	delay_ms(100);
-	car(2,speed,11450*4-CAR_ARC_90_TRIM_PULSES);
-	delay_ms(100);
-	car(10,speed,0);
-	delay_ms(300);
+	car(12,speed,28000);
+	delay_ms(200);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,22200*4-CAR_ARC_90_TRIM_PULSES);
+	car(2,speed,76000);
+	delay_ms(200);
+	car(0,90,0);
 	delay_ms(50);
 	car(8,speed,4000*4);
 
