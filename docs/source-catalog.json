@@ -2,7 +2,7 @@
   {
     "label": "当前C盘主控工程",
     "destination": "stm32",
-    "files": 117
+    "files": 123
   },
   {
     "label": "工创原始资料与初版备份",
@@ -122,6 +122,6 @@
   {
     "label": "屏幕融合完整工程（独立于当前主控）",
     "destination": "variants/screen-fusion",
-    "files": 118
+    "files": 124
   }
 ]

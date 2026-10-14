@@ -1068,7 +1068,7 @@ void qidian()
 //	}
 //	
 	//µ÷Õý
-	
+	zhou(fang2);
 	delay_ms(100);
 	car(12,speed,28000);
 	delay_ms(200);

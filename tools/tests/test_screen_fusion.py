@@ -29,6 +29,8 @@ PRE = r'''
 #include <string.h>
 #include <setjmp.h>
 static unsigned checks;
+/* Keep this protocol fixture independent of the RAM logger. */
+static void GyroLog_TaskComplete(void) {}
 #define CHECK(c) do {++checks;if(!(c)){fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#c);exit(2);}} while(0)
 #define ENABLE 1
 #define DISABLE 0

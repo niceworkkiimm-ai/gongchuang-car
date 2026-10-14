@@ -1,3 +1,4 @@
+#include "gyro_log.h"
 #include "board.h"
 #include "delay.h"
 #include "usart.h"
@@ -49,6 +50,7 @@ int main(void)
 /**********************************************************
 ***	初始化板载外设
 **********************************************************/
+	GyroLog_Init();
 	uart_init4();
 	board_init();
 	OLED_Init();
@@ -186,6 +188,7 @@ int main(void)
 	cujiagong2();
 	zancunqu2();
 	qidian();
+	GyroLog_TaskComplete();
 
 //	
 ///**********************************************************
@@ -224,6 +227,7 @@ void TIM2_IRQHandler(void)
 //		}
 //		rxFrameFlag = false;
     anglea = angle(global_angle,0,0);//角度环目标角度
+    GyroLog_Tick();
 //				Usart_SendByte4(UART4, uart4_RxData);
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 	}

@@ -1,3 +1,4 @@
+#include "gyro_log.h"
 #include "delay.h"
 #include "Emm_V5.h"
 #include "usart.h"
@@ -29,6 +30,7 @@ void car(dir,speed,location)
     car_debug_mode = (int16_t)dir;
     car_debug_target = dir == 0 ? (int16_t)speed : 0;
     car_debug_active = 1;
+    GyroLog_CarBegin(dir, speed);
 	while ((rxCmd[1] != 0x00) || (rxCmd[2] != 0x00) || (rxCmd[3] != 0x00))
 	{
 
@@ -45,12 +47,16 @@ void car(dir,speed,location)
 			{
 				delay_ms(10);
 				Emm_V5_Vel_Control(1, 1, 10, 10,0);
+                GyroLog_Mark(GLOG_VELOCITY_SENT, 1, 1);
 				delay_ms(10);
 				Emm_V5_Vel_Control(2, 1, 10, 10,0);
+                GyroLog_Mark(GLOG_VELOCITY_SENT, 2, 1);
 				delay_ms(10);
 				Emm_V5_Vel_Control(3, 1, 10, 10,0);
+                GyroLog_Mark(GLOG_VELOCITY_SENT, 3, 1);
 				delay_ms(10);
 				Emm_V5_Vel_Control(4, 1, 10, 10,0);
+                GyroLog_Mark(GLOG_VELOCITY_SENT, 4, 1);
 
 			}
 			if (!Car_HeadingReached((float)speed) &&
@@ -58,25 +64,34 @@ void car(dir,speed,location)
 			{
 				delay_ms(10);
 				Emm_V5_Vel_Control(1, 0, 10, 10,0);
+                GyroLog_Mark(GLOG_VELOCITY_SENT, 1, 0);
 				delay_ms(10);
 				Emm_V5_Vel_Control(2, 0, 10, 10,0);
+                GyroLog_Mark(GLOG_VELOCITY_SENT, 2, 0);
 				delay_ms(10);
 				Emm_V5_Vel_Control(3, 0, 10, 10,0);
+                GyroLog_Mark(GLOG_VELOCITY_SENT, 3, 0);
 				delay_ms(10);
 				Emm_V5_Vel_Control(4, 0, 10, 10,0);
+                GyroLog_Mark(GLOG_VELOCITY_SENT, 4, 0);
 
 			}
 		while (1){
 			if (Car_HeadingReached((float)speed))
 			{
+                GyroLog_Mark(GLOG_HEADING_WINDOW, 0, 0);
 				delay_ms(10);
 				Emm_V5_Stop_Now(1,0);
+                GyroLog_Mark(GLOG_STOP_SENT, 1, 0);
 				delay_ms(10);
 				Emm_V5_Stop_Now(2,0);
+                GyroLog_Mark(GLOG_STOP_SENT, 2, 0);
 				delay_ms(10);
 				Emm_V5_Stop_Now(3,0);
+                GyroLog_Mark(GLOG_STOP_SENT, 3, 0);
 				delay_ms(10);
 				Emm_V5_Stop_Now(4,0);
+                GyroLog_Mark(GLOG_STOP_SENT, 4, 0);
 				break;
 			}
 			Gyro_DisplayPoll(); /* Keep OLED live while waiting. */
@@ -477,4 +492,5 @@ void car(dir,speed,location)
         }
     }
     car_debug_active = 0;
+    GyroLog_CarEnd();
 }

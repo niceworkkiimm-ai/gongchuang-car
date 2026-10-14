@@ -536,6 +536,16 @@
               <FilePath>..\hardware\PID.h</FilePath>
             </File>
             <File>
+              <FileName>gyro_log.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hardware\gyro_log.c</FilePath>
+            </File>
+            <File>
+              <FileName>gyro_log.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\hardware\gyro_log.h</FilePath>
+            </File>
+            <File>
               <FileName>uart_3.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\hardware\uart_3.c</FilePath>

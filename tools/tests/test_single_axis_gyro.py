@@ -26,6 +26,8 @@ static struct { uint16_t SR, DR; } uart;
 volatile float global_angle, angular_velocity_z;
 volatile uint8_t new_data_received;
 volatile uint32_t gyro_yaw_frame_count;
+/* The separate logger has its own production-module tests. */
+static void GyroLog_OnYaw(void) {}
 static uint8_t sent[64];
 static unsigned sent_count, waits[8], wait_count;
 static void Usart3_SendByte(uint8_t byte) { sent[sent_count++] = byte; }

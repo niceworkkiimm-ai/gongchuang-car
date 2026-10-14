@@ -1,3 +1,4 @@
+#include "gyro_log.h"
 #include "stm32f10x.h"                  // Device header
 #include <stdio.h>
 #include <stdarg.h>
@@ -180,6 +181,7 @@ void ParseAndPrintData(uint8_t *data, uint16_t length)
         else if (yaw < -180.0f) yaw += 360.0f;
         global_angle = yaw;
         ++gyro_yaw_frame_count;
+        GyroLog_OnYaw();
     }
     else
     {
