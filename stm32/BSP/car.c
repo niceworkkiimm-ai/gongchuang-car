@@ -15,7 +15,7 @@ int speed_add=150;
 extern volatile float global_angle;
 
 /* Keep fractional yaw. Arrival uses the shortest wrapped angular error. */
-#define CAR_HEADING_TOLERANCE_DEG 0.1f
+#define CAR_HEADING_TOLERANCE_DEG 0.3f
 static uint8_t Car_HeadingReached(float target)
 {
     float error = target - anglea;

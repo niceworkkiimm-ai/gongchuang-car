@@ -37,7 +37,7 @@ uint8_t saoma_data[1000];
  */
 #define HMI_SCAN_LENGTH 15U
 #define HMI_COMMAND_PREFIX "page0.t0.txt=\""
-#define HMI_FRAME_LENGTH ((sizeof(HMI_COMMAND_PREFIX) - 1U) + HMI_SCAN_LENGTH + 4U)
+#define HMI_FRAME_LENGTH ((sizeof(HMI_COMMAND_PREFIX) - 1U) + HMI_SCAN_LENGTH + 6U)
 static volatile uint8_t hmi_pending_scan[HMI_SCAN_LENGTH];
 static volatile uint8_t hmi_pending = 0;
 static uint8_t hmi_tx_frame[HMI_FRAME_LENGTH];
@@ -68,7 +68,15 @@ static void HMI_TransmitByte(void)
         for (i = 0; i < sizeof(prefix) - 1U; ++i)
             hmi_tx_frame[pos++] = (uint8_t)prefix[i];
         for (i = 0; i < HMI_SCAN_LENGTH; ++i)
+        {
+            /* HMI newline after the second plus: literal backslash + r. */
+            if (i == 8U)
+            {
+                hmi_tx_frame[pos++] = '\\';
+                hmi_tx_frame[pos++] = 'r';
+            }
             hmi_tx_frame[pos++] = hmi_pending_scan[i];
+        }
         hmi_tx_frame[pos++] = '"';
         hmi_tx_frame[pos++] = 0xFF;
         hmi_tx_frame[pos++] = 0xFF;
