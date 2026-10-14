@@ -38,7 +38,7 @@ int map_value(int x, int in_min, int in_max, int out_min, int out_max)
 }
 
 #define VISION_FRAME_STALE_MS 1500UL
-#define VISION_CENTER_TOLERANCE 5
+#define VISION_CENTER_TOLERANCE 4
 #define VISION_LOCK_CONFIRM_FRAMES 3U
 
 static void Vision_ReadCameraFeedback(uint32_t *frames, uint32_t *last_frame_ms,

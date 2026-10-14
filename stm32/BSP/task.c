@@ -348,14 +348,14 @@ void yuanliao()
 void cujiagong()
 {
     /* First coarse-processing round only; pixel X grows right, Y grows down. */
-    const int ring_center_x = 140;
+    const int ring_center_x = 148;
     const int ring_center_y = 128;
 
 	/* Wang Kai route: inter-station travel. */
 	car(6,speed,4500*4);
 	delay_ms(200);
 	car(0,0,0);
-	car(2,speed,22000*4);
+	car(2,speed,22250*4);
 	delay_ms(50);
 	zhou(guiwei);    //夹子正对物料
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降
@@ -397,7 +397,7 @@ void cujiagong()
 				delay_ms(100);
 				zancun_na(1,500,1850*4,1);
 				fnwuliao2();
-				delay_ms(200);
+				//delay_ms(100);
 				zancun_na(1,500,1850*4,2);
 				fnwuliao3();
 				car(2,500,1850*4); /* From ring 1 back to center ring 2. */
@@ -423,7 +423,7 @@ void cujiagong()
 				delay_ms(100);
 				zancun_na(2,500,1850*4,1);
 				fnwuliao2();
-				delay_ms(200);
+				//delay_ms(100);
 				zancun_na(1,500,3700*4,2);
 				fnwuliao3();
 				car(2,500,1850*4); /* From ring 1 back to center ring 2. */
@@ -457,7 +457,7 @@ void cujiagong()
 				delay_ms(100);
 				zancun_na(1,500,3700*4,1);
 				fnwuliao2();
-				delay_ms(200);
+				//delay_ms(100);
 				zancun_na(2,500,1850*4,2);
 				fnwuliao3();
 				/* At center ring 2; ready for the next task. */
@@ -483,7 +483,7 @@ void cujiagong()
 				delay_ms(100);
 				zancun_na(2,500,3700*4,1);
 				fnwuliao2();
-				delay_ms(200);
+				//delay_ms(100);
 				zancun_na(1,500,1850*4,2);
 				fnwuliao3();
 				/* At center ring 2; ready for the next task. */
@@ -517,7 +517,7 @@ void cujiagong()
 				delay_ms(100);
 				zancun_na(2,500,1850*4,1);
 				fnwuliao2();
-				delay_ms(200);
+				//delay_ms(100);
 				zancun_na(2,500,1850*4,2);
 				fnwuliao3();
 				car(0,-90,0); /* Restore the coarse-area heading before returning. */
@@ -544,7 +544,7 @@ void cujiagong()
 				delay_ms(100);
 				zancun_na(1,500,1850*4,1);
 				fnwuliao2();
-				delay_ms(200);
+				//delay_ms(100);
 				zancun_na(2,500,3700*4,2);
 				fnwuliao3();
 				car(0,-90,0); /* Restore the coarse-area heading before returning. */
@@ -561,7 +561,7 @@ void cujiagong()
 void zancunqu()
 {
     /* Same physical tray order as cujiagong: 3, 2, 1. */
-    const int ring_center_x = 140;
+    const int ring_center_x = 148;
     const int ring_center_y = 128;
 	
 	
@@ -728,11 +728,11 @@ void yuanliao2()
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(300);
-	car(12,speed,42000-CAR_ARC_90_TRIM_PULSES);
+	car(12,speed,44000-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(50);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,32000);
+	car(2,speed,31000);
 	delay_ms(300);
 
 	zhuazikai();
@@ -762,13 +762,13 @@ void yuanliao2()
 
 void cujiagong2()
 {
-    const int ring_center_x = 140;
+    const int ring_center_x = 148;
     const int ring_center_y = 128;
 	/* Wang Kai route: inter-station travel. */
 	car(6,speed,4500*4);
 	delay_ms(300);
 	car(0,0,0);
-	car(2,speed,22000*4);
+	car(2,speed,22250*4);
 	delay_ms(50);
 	zhou(guiwei);    //夹子正对物料
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降
@@ -994,7 +994,7 @@ void zancunqu2()
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
-	car(2,speed,16000*2); 
+	car(2,speed,16250*2); 
 	delay_ms(300);
 	
 
@@ -1726,8 +1726,8 @@ void ceshi8(void)
 {
 	
 	
-	const int ring_center_x = 140;
-	const int ring_center_y = 128;
+	const int ring_center_x = 148;		//变大物料往左偏
+	const int ring_center_y = 128;		//变大物料往上偏
 	
 	zhou(guiwei);   
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降	

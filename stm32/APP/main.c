@@ -58,7 +58,7 @@ int main(void)
 	Usart_Init2();
 	SysTick_Init();
 	Scanner_DisplayInit();
-#if 0 /* SIMULATED_SCAN: set to 0 to use the real scanner. */
+#if 1 /* SIMULATED_SCAN: set to 0 to use the real scanner. */
     {
         const char simulated_scan[] = "123+321+213+231";
         uint32_t irq_mask = __get_PRIMASK();
@@ -177,7 +177,7 @@ int main(void)
 	//car(2,500,4000);
 	//for(; ;);
 	
-	//ceshi10();
+	//ceshi8();		//测试粗加工圆环坐标
 	//for(; ;);
 	yuanliao();
 	cujiagong();

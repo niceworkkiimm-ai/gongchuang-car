@@ -118,5 +118,10 @@
     "label": "此前保存的修改快照：wl-valid-feedback-fix-20261003-172222",
     "destination": "history/local-snapshots/wl-valid-feedback-fix-20261003-172222",
     "files": 241
+  },
+  {
+    "label": "屏幕融合完整工程（独立于当前主控）",
+    "destination": "variants/screen-fusion",
+    "files": 118
   }
 ]
