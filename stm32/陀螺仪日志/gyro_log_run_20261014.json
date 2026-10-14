@@ -1,0 +1,23 @@
+{
+  "magic": 1196185927,
+  "version": 1,
+  "header_size": 64,
+  "record_size": 32,
+  "event_capacity": 512,
+  "sample_capacity": 1024,
+  "event_count": 273,
+  "sample_count": 1024,
+  "sample_next": 860,
+  "sample_total": 1884,
+  "events_dropped": 0,
+  "frozen": 1,
+  "clock_hz": 72000000,
+  "max_write_cycles": 108,
+  "max_tick_cycles": 480,
+  "flags": 1,
+  "snapshot_address": "0x2000031c",
+  "samples_overwritten": 860,
+  "max_record_body_us": 1.5,
+  "max_tick_body_us": 6.666666666666667,
+  "note": "停车记录为发送函数返回，不是到位或电机ACK；后续角度可能发生在下一动作期间。"
+}

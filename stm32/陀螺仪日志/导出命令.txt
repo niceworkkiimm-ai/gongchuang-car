@@ -1,1 +1,1 @@
-SAVE gyro_log.hex 0x2000031C, 0x2000C35B
+SAVE gyro_log.hex 0x20000324, 0x2000C363

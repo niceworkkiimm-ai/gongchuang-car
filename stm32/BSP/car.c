@@ -3,6 +3,8 @@
 #include "Emm_V5.h"
 #include "usart.h"
 #include "gyro_debug.h"
+#include "car.h"
+#include "camera_debug.h"
 
 volatile float anglea=0;
 /* Observation only: these values never select or stop motor commands. */
@@ -14,18 +16,220 @@ int speed_add=150;
 
 extern volatile float global_angle;
 
-/* Keep fractional yaw. Arrival uses the shortest wrapped angular error. */
-#define CAR_HEADING_TOLERANCE_DEG 0.3f
-static uint8_t Car_HeadingReached(float target)
+/* car(0) only: keep the user's angular tolerance. */
+#define CAR_HEADING_TOLERANCE_DEG 0.4f
+#define CAR_HEADING_MEDIUM_ZONE_DEG 10.0f
+#define CAR_HEADING_FINE_ZONE_DEG 2.0f
+#define CAR_HEADING_FAST_RPM 10U
+#define CAR_HEADING_MEDIUM_RPM 3U
+#define CAR_HEADING_FINE_RPM 1U
+#define CAR_HEADING_COMMAND_GAP_MS 10U
+#define CAR_HEADING_BRAKE_SECONDS 0.07f
+#define CAR_HEADING_MAX_BRAKE_DEG 1.0f
+#define CAR_HEADING_SETTLE_MIN_MS 80UL
+#define CAR_HEADING_STABLE_MS 120UL
+#define CAR_HEADING_STABLE_RANGE_DEG 0.12f
+#define CAR_HEADING_STABLE_RATE_DPS 1.5f
+#define CAR_HEADING_STALE_MS 100UL
+#define CAR_HEADING_TIMEOUT_MS 15000UL
+
+extern volatile float angular_velocity_z;
+volatile uint8_t car_heading_status = CAR_HEADING_IDLE;
+volatile float car_heading_error_deg = 0.0f;
+volatile float car_heading_rate_dps = 0.0f;
+
+static float Car_Abs(float value)
 {
-    float error = target - anglea;
-    if (error > 180.0f) error -= 360.0f;
-    else if (error < -180.0f) error += 360.0f;
-    return error >= -CAR_HEADING_TOLERANCE_DEG &&
-           error <= CAR_HEADING_TOLERANCE_DEG;
+    return value < 0.0f ? -value : value;
 }
 
-void car(dir,speed,location)
+static float Car_HeadingError(float target, float yaw)
+{
+    float error = target - yaw;
+    if (error > 180.0f) error -= 360.0f;
+    else if (error < -180.0f) error += 360.0f;
+    return error;
+}
+
+static void Car_ReadHeading(float *yaw, float *rate, uint32_t *frames)
+{
+    uint32_t mask = __get_PRIMASK();
+    __disable_irq();
+    *yaw = global_angle; /* Latest validated UART3 angle, not the 20ms copy. */
+    *rate = angular_velocity_z;
+    *frames = gyro_yaw_frame_count;
+    __set_PRIMASK(mask);
+}
+
+static void Car_StopHeadingWheels(void)
+{
+    uint8_t motor;
+    /* Stop motor 1 immediately; keep existing bus spacing between motors. */
+    for (motor = 1; motor <= 4; ++motor)
+    {
+        if (motor != 1) delay_ms(CAR_HEADING_COMMAND_GAP_MS);
+        Emm_V5_Stop_Now(motor, 0);
+        GyroLog_Mark(GLOG_STOP_SENT, motor, 0);
+    }
+}
+
+static void Car_SendHeadingVelocity(uint8_t direction, uint16_t rpm)
+{
+    uint8_t motor;
+    for (motor = 1; motor <= 4; ++motor)
+    {
+        delay_ms(CAR_HEADING_COMMAND_GAP_MS);
+        Emm_V5_Vel_Control(motor, direction, rpm, 10, 0);
+        GyroLog_Mark(GLOG_VELOCITY_SENT, motor, direction);
+    }
+}
+
+static uint8_t Car_HeadingFailure(uint8_t status)
+{
+    Car_StopHeadingWheels();
+    car_heading_status = status;
+    return 0;
+}
+
+static uint8_t Car_AlignHeading(float target)
+{
+    float yaw, rate, error, distance, anchor = 0.0f, brake;
+    uint32_t frames, last_frames, now, start, last_frame_ms, stopped_ms;
+    uint32_t stable_start_ms = 0;
+    uint16_t commanded_rpm = 0, requested_rpm;
+    uint8_t moving = 0, direction = 0, requested_direction, new_frame;
+    uint8_t stable_started = 0, stable_frames = 0, window_logged = 0;
+    uint8_t stable_in_window = 0;
+
+    car_heading_status = CAR_HEADING_RUNNING;
+    Car_ReadHeading(&yaw, &rate, &last_frames);
+    start = CameraDebug_NowMs();
+    last_frame_ms = start;
+    /* Cancel any residual arc/position motion before starting a new heading. */
+    delay_ms(CAR_HEADING_COMMAND_GAP_MS);
+    Car_StopHeadingWheels();
+    stopped_ms = CameraDebug_NowMs();
+
+    while (1)
+    {
+        Car_ReadHeading(&yaw, &rate, &frames);
+        now = CameraDebug_NowMs();
+        new_frame = frames != last_frames;
+        if (new_frame)
+        {
+            last_frames = frames;
+            last_frame_ms = now;
+        }
+        /* Reject NaN/out-of-range data without allowing the next route step. */
+        if (!(yaw >= -180.0f && yaw <= 180.0f &&
+              rate >= -2000.0f && rate <= 2000.0f &&
+              target >= -180.0f && target <= 180.0f))
+            return Car_HeadingFailure(CAR_HEADING_BAD_DATA);
+        error = Car_HeadingError(target, yaw);
+        distance = Car_Abs(error);
+        car_heading_error_deg = error;
+        car_heading_rate_dps = rate;
+        if ((uint32_t)(now - start) >= CAR_HEADING_TIMEOUT_MS)
+            return Car_HeadingFailure(CAR_HEADING_TIMEOUT);
+        if ((uint32_t)(now - last_frame_ms) >= CAR_HEADING_STALE_MS)
+            return Car_HeadingFailure(CAR_HEADING_STALE);
+
+        if (distance <= CAR_HEADING_TOLERANCE_DEG && !window_logged)
+        {
+            GyroLog_Mark(GLOG_HEADING_WINDOW, 0, 0);
+            window_logged = 1;
+        }
+        requested_direction = error >= 0.0f ? 1U : 0U;
+        if (moving)
+        {
+            brake = CAR_HEADING_TOLERANCE_DEG;
+            if (commanded_rpm == CAR_HEADING_FINE_RPM &&
+                ((direction && rate > 0.0f) || (!direction && rate < 0.0f)))
+            {
+                brake = Car_Abs(rate) * CAR_HEADING_BRAKE_SECONDS;
+                if (brake < CAR_HEADING_TOLERANCE_DEG)
+                    brake = CAR_HEADING_TOLERANCE_DEG;
+                if (brake > CAR_HEADING_MAX_BRAKE_DEG)
+                    brake = CAR_HEADING_MAX_BRAKE_DEG;
+            }
+            /* Also stop on a crossing; never reverse four moving wheels. */
+            if (distance <= brake || requested_direction != direction)
+            {
+                Car_StopHeadingWheels();
+                stopped_ms = CameraDebug_NowMs();
+                moving = 0;
+                stable_started = 0;
+                stable_frames = 0;
+            }
+            else
+            {
+                requested_rpm = distance > CAR_HEADING_MEDIUM_ZONE_DEG ?
+                    CAR_HEADING_FAST_RPM :
+                    (distance > CAR_HEADING_FINE_ZONE_DEG ?
+                     CAR_HEADING_MEDIUM_RPM : CAR_HEADING_FINE_RPM);
+                /* Only reduce an active turn; resume speed after a full stop. */
+                if (requested_rpm < commanded_rpm)
+                {
+                    Car_SendHeadingVelocity(direction, requested_rpm);
+                    commanded_rpm = requested_rpm;
+                }
+            }
+        }
+        else if (new_frame)
+        {
+            /* Verify actual settling using BOTH rate and a fresh-angle range. */
+            if ((uint32_t)(now - stopped_ms) < CAR_HEADING_SETTLE_MIN_MS ||
+                Car_Abs(rate) > CAR_HEADING_STABLE_RATE_DPS)
+            {
+                stable_started = 0;
+                stable_frames = 0;
+            }
+            else
+            {
+                if (!stable_started ||
+                    Car_Abs(Car_HeadingError(anchor, yaw)) >
+                    CAR_HEADING_STABLE_RANGE_DEG)
+                {
+                    anchor = yaw;
+                    stable_start_ms = now;
+                    stable_started = 1;
+                    stable_frames = 1;
+                    stable_in_window = distance <= CAR_HEADING_TOLERANCE_DEG;
+                }
+                else
+                {
+                    if (stable_frames < 255U) ++stable_frames;
+                    if (distance > CAR_HEADING_TOLERANCE_DEG)
+                        stable_in_window = 0;
+                }
+                if (stable_frames >= 3U &&
+                    (uint32_t)(now - stable_start_ms) >= CAR_HEADING_STABLE_MS)
+                {
+                    if (stable_in_window && distance <= CAR_HEADING_TOLERANCE_DEG)
+                    {
+                        car_heading_status = CAR_HEADING_SUCCESS;
+                        return 1;
+                    }
+                    requested_rpm = distance > CAR_HEADING_MEDIUM_ZONE_DEG ?
+                        CAR_HEADING_FAST_RPM :
+                        (distance > CAR_HEADING_FINE_ZONE_DEG ?
+                         CAR_HEADING_MEDIUM_RPM : CAR_HEADING_FINE_RPM);
+                    Car_SendHeadingVelocity(requested_direction, requested_rpm);
+                    direction = requested_direction;
+                    commanded_rpm = requested_rpm;
+                    moving = 1;
+                    stable_started = 0;
+                    stable_frames = 0;
+                    window_logged = 0;
+                }
+            }
+        }
+        Gyro_DisplayPoll();
+        delay_ms(5);
+    }
+}
+
+void car(int dir, int speed, int location)
 {
     car_debug_mode = (int16_t)dir;
     car_debug_target = dir == 0 ? (int16_t)speed : 0;
@@ -41,61 +245,15 @@ void car(dir,speed,location)
 
 	if (dir == 0)
 	{
-
-			if (!Car_HeadingReached((float)speed) &&
-                ((anglea < speed) || ((anglea > speed) && (anglea >135))))
-			{
-				delay_ms(10);
-				Emm_V5_Vel_Control(1, 1, 10, 10,0);
-                GyroLog_Mark(GLOG_VELOCITY_SENT, 1, 1);
-				delay_ms(10);
-				Emm_V5_Vel_Control(2, 1, 10, 10,0);
-                GyroLog_Mark(GLOG_VELOCITY_SENT, 2, 1);
-				delay_ms(10);
-				Emm_V5_Vel_Control(3, 1, 10, 10,0);
-                GyroLog_Mark(GLOG_VELOCITY_SENT, 3, 1);
-				delay_ms(10);
-				Emm_V5_Vel_Control(4, 1, 10, 10,0);
-                GyroLog_Mark(GLOG_VELOCITY_SENT, 4, 1);
-
-			}
-			if (!Car_HeadingReached((float)speed) &&
-                ((anglea > speed) || ((anglea < speed) && (anglea <-135))))
-			{
-				delay_ms(10);
-				Emm_V5_Vel_Control(1, 0, 10, 10,0);
-                GyroLog_Mark(GLOG_VELOCITY_SENT, 1, 0);
-				delay_ms(10);
-				Emm_V5_Vel_Control(2, 0, 10, 10,0);
-                GyroLog_Mark(GLOG_VELOCITY_SENT, 2, 0);
-				delay_ms(10);
-				Emm_V5_Vel_Control(3, 0, 10, 10,0);
-                GyroLog_Mark(GLOG_VELOCITY_SENT, 3, 0);
-				delay_ms(10);
-				Emm_V5_Vel_Control(4, 0, 10, 10,0);
-                GyroLog_Mark(GLOG_VELOCITY_SENT, 4, 0);
-
-			}
-		while (1){
-			if (Car_HeadingReached((float)speed))
-			{
-                GyroLog_Mark(GLOG_HEADING_WINDOW, 0, 0);
-				delay_ms(10);
-				Emm_V5_Stop_Now(1,0);
-                GyroLog_Mark(GLOG_STOP_SENT, 1, 0);
-				delay_ms(10);
-				Emm_V5_Stop_Now(2,0);
-                GyroLog_Mark(GLOG_STOP_SENT, 2, 0);
-				delay_ms(10);
-				Emm_V5_Stop_Now(3,0);
-                GyroLog_Mark(GLOG_STOP_SENT, 3, 0);
-				delay_ms(10);
-				Emm_V5_Stop_Now(4,0);
-                GyroLog_Mark(GLOG_STOP_SENT, 4, 0);
-				break;
-			}
-			Gyro_DisplayPoll(); /* Keep OLED live while waiting. */
-		}
+        if (!Car_AlignHeading((float)speed))
+        {
+            /* Fault hold: do not run the next route step with a bad heading. */
+            while (1)
+            {
+                Gyro_DisplayPoll();
+                delay_ms(20);
+            }
+        }
 	}
 		
 	if (dir == 1) 
