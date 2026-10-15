@@ -47,15 +47,15 @@ static uint8_t hmi_tx_index = HMI_FRAME_LENGTH;
 
 
 /* Both screenshot commands write page0.t0; the overlapping t1 stays hidden.
- * GB2312 bytes are explicit; both displayed counts are fixed at 6 as requested.
+ * GB2312 bytes are explicit; both displayed counts are fixed at 12 as requested.
  */
 static const uint8_t hmi_scan_setup[] =
     HMI_PAGE0_SELECT;
 static const uint8_t hmi_result_commands[] =
     HMI_PAGE0_SELECT
     "page0.t0.txt=\""
-    "\xD5\xFD\xC8\xB7\xB7\xC5\xD6\xC3" "\\r" "\xB4\xCE\xCA\xFD\xA3\xBA" "6" "\\r"
-    "\xD5\xFD\xC8\xB7\xD7\xA5\xC8\xA1" "\\r" "\xB4\xCE\xCA\xFD\xA3\xBA" "6"
+    "\xD5\xFD\xC8\xB7\xB7\xC5\xD6\xC3" "\\r" "\xB4\xCE\xCA\xFD\xA3\xBA" "12" "\\r"
+    "\xD5\xFD\xC8\xB7\xD7\xA5\xC8\xA1" "\\r" "\xB4\xCE\xCA\xFD\xA3\xBA" "12"
     "\"\xFF\xFF\xFF";
 static const uint8_t *hmi_control_commands = 0;
 static uint16_t hmi_control_index = 0;
