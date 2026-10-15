@@ -189,6 +189,7 @@ int main(void)
 	zancunqu2();
 	qidian();
 	GyroLog_TaskComplete();
+	HMI_ShowTaskComplete(); /* After the original final return has finished. */
 
 //	
 ///**********************************************************

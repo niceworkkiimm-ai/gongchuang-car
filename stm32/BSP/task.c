@@ -359,7 +359,7 @@ void cujiagong()
 	car(2,speed,22250*4);
 	delay_ms(50);
 	zhou(guiwei);    //夹子正对物料
-	Emm_V5_Pos_Control(5, 1, 500, 200, 11000, 0, 0);    //升降台降
+	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降
 	delay_ms(350);
 	car(6,speed,4450*4);
 	delay_ms(200);
@@ -569,7 +569,7 @@ void zancunqu()
 	car(0,-90,0);
 	delay_ms(200);
 	
-	car(12,speed,42000-CAR_ARC_90_TRIM_PULSES); 
+	car(12,speed,43000-CAR_ARC_90_TRIM_PULSES); 
 	delay_ms(50);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
@@ -733,11 +733,11 @@ void yuanliao2()
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(300);
-	car(12,speed,44000-CAR_ARC_90_TRIM_PULSES);
+	car(12,speed,43000-CAR_ARC_90_TRIM_PULSES);
 	delay_ms(50);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,31000);
+	car(2,speed,30000);
 	delay_ms(300);
 
 	zhuazikai();

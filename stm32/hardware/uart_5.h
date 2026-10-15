@@ -14,6 +14,8 @@ extern volatile uint32_t scanner_error_count;
 extern volatile uint32_t scanner_last_error;
 extern volatile uint8_t scanner_raw_tail[8];
 void Scanner_WaitForData(void);
+/* Fixed screen result, requested only after the final return function. */
+void HMI_ShowTaskComplete(void);
 void Scanner_DisplayInit(void);
 void Scanner_DisplayPoll(uint32_t elapsed_ms);
 extern volatile uint8_t scanner_camera_tx_valid;

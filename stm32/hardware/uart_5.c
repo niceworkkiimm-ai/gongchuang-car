@@ -36,20 +36,95 @@ uint8_t saoma_data[1000];
  * RX and polling serialize queue access; the active TX frame stays private.
  */
 #define HMI_SCAN_LENGTH 15U
-#define HMI_COMMAND_PREFIX "page0.t0.txt=\""
+#define HMI_PAGE0_SELECT "page page0\xFF\xFF\xFF" \
+    "vis t1,0\xFF\xFF\xFF" "vis t0,1\xFF\xFF\xFF"
+#define HMI_COMMAND_PREFIX HMI_PAGE0_SELECT "page0.t0.txt=\""
 #define HMI_FRAME_LENGTH ((sizeof(HMI_COMMAND_PREFIX) - 1U) + HMI_SCAN_LENGTH + 6U)
 static volatile uint8_t hmi_pending_scan[HMI_SCAN_LENGTH];
 static volatile uint8_t hmi_pending = 0;
 static uint8_t hmi_tx_frame[HMI_FRAME_LENGTH];
 static uint8_t hmi_tx_index = HMI_FRAME_LENGTH;
 
+
+/* Both screenshot commands write page0.t0; the overlapping t1 stays hidden.
+ * GB2312 bytes are explicit; both displayed counts are fixed at 6 as requested.
+ */
+static const uint8_t hmi_scan_setup[] =
+    HMI_PAGE0_SELECT;
+static const uint8_t hmi_result_commands[] =
+    HMI_PAGE0_SELECT
+    "page0.t0.txt=\""
+    "\xD5\xFD\xC8\xB7\xB7\xC5\xD6\xC3" "\\r" "\xB4\xCE\xCA\xFD\xA3\xBA" "6" "\\r"
+    "\xD5\xFD\xC8\xB7\xD7\xA5\xC8\xA1" "\\r" "\xB4\xCE\xCA\xFD\xA3\xBA" "6"
+    "\"\xFF\xFF\xFF";
+static const uint8_t *hmi_control_commands = 0;
+static uint16_t hmi_control_index = 0;
+static volatile uint8_t hmi_result_requested = 0;
+static volatile uint8_t hmi_result_pending = 0;
+
+/* Share the free-running DWT clock with vision/OLED; never reset CYCCNT. */
+#define HMI_DWT_CTRL   (*(volatile uint32_t *)0xE0001000UL)
+#define HMI_DWT_CYCCNT (*(volatile uint32_t *)0xE0001004UL)
+#define HMI_STARTUP_RETRIES 12U
+static volatile uint8_t hmi_startup_pending = 0;
+static volatile uint8_t hmi_startup_retries = 0;
+static uint32_t hmi_startup_tick = 0;
+
+/* Foreground only; retry visibility while the screen may still be booting.
+ * The first scan or final result ends this startup-only retry window.
+ */
+static void HMI_PollStartup(void)
+{
+    uint32_t now, mask;
+    if (!hmi_startup_retries || (SCB->ICSR & 0x1FFU)) return;
+    now = HMI_DWT_CYCCNT;
+    if ((uint32_t)(now - hmi_startup_tick) < SystemCoreClock / 4U) return;
+    mask = __get_PRIMASK();
+    __disable_irq();
+    if (hmi_startup_retries)
+    {
+        hmi_startup_tick = now;
+        --hmi_startup_retries;
+        hmi_startup_pending = 1;
+        USART_ITConfig(UART5, USART_IT_TXE, ENABLE);
+    }
+    __set_PRIMASK(mask);
+}
+
+/* Foreground request only. The IRQ finishes the active frame before the result. */
+void HMI_ShowTaskComplete(void)
+{
+    uint32_t mask = __get_PRIMASK();
+    __disable_irq();
+    if (!hmi_result_requested)
+    {
+        hmi_result_requested = 1;
+        hmi_result_pending = 1;
+        hmi_startup_retries = 0;
+        hmi_startup_pending = 0;
+        hmi_pending = 0;
+        USART_ITConfig(UART5, USART_IT_TXE, ENABLE);
+    }
+    __set_PRIMASK(mask);
+}
+
 static void HMI_QueueScan(const uint8_t *scan)
 {
     uint8_t i;
+    uint32_t mask = __get_PRIMASK();
+    __disable_irq();
+    if (hmi_result_requested)
+    {
+        __set_PRIMASK(mask);
+        return;
+    }
+    hmi_startup_retries = 0;
+    hmi_startup_pending = 0;
     for (i = 0; i < HMI_SCAN_LENGTH; ++i)
         hmi_pending_scan[i] = scan[i];
     hmi_pending = 1;
     USART_ITConfig(UART5, USART_IT_TXE, ENABLE);
+    __set_PRIMASK(mask);
 }
 
 static void HMI_TransmitByte(void)
@@ -59,6 +134,30 @@ static void HMI_TransmitByte(void)
     uint8_t pos;
     if (hmi_tx_index == HMI_FRAME_LENGTH)
     {
+        if (!hmi_control_commands && hmi_result_pending)
+        {
+            hmi_control_commands = hmi_result_commands;
+            hmi_control_index = 0;
+            hmi_result_pending = 0;
+        }
+        if (!hmi_control_commands && hmi_startup_pending && !hmi_result_requested)
+        {
+            hmi_control_commands = hmi_scan_setup;
+            hmi_control_index = 0;
+            hmi_startup_pending = 0;
+        }
+        if (hmi_control_commands)
+        {
+            USART_SendData(UART5, hmi_control_commands[hmi_control_index++]);
+            if (hmi_control_commands[hmi_control_index] == '\0')
+            {
+                hmi_control_commands = 0;
+                hmi_control_index = 0;
+                if (!hmi_result_pending && !hmi_pending && !hmi_startup_pending)
+                    USART_ITConfig(UART5, USART_IT_TXE, DISABLE);
+            }
+            return;
+        }
         if (!hmi_pending)
         {
             USART_ITConfig(UART5, USART_IT_TXE, DISABLE);
@@ -69,7 +168,6 @@ static void HMI_TransmitByte(void)
             hmi_tx_frame[pos++] = (uint8_t)prefix[i];
         for (i = 0; i < HMI_SCAN_LENGTH; ++i)
         {
-            /* HMI newline after the second plus: literal backslash + r. */
             if (i == 8U)
             {
                 hmi_tx_frame[pos++] = '\\';
@@ -85,7 +183,8 @@ static void HMI_TransmitByte(void)
         hmi_tx_index = 0;
     }
     USART_SendData(UART5, hmi_tx_frame[hmi_tx_index++]);
-    if ((hmi_tx_index == HMI_FRAME_LENGTH) && !hmi_pending)
+    if ((hmi_tx_index == HMI_FRAME_LENGTH) && !hmi_pending &&
+        !hmi_result_pending && !hmi_control_commands && !hmi_startup_pending)
         USART_ITConfig(UART5, USART_IT_TXE, DISABLE);
 }
 
@@ -108,6 +207,15 @@ void uart_init5()
     scan_count = 0;
     hmi_pending = 0;
     hmi_tx_index = HMI_FRAME_LENGTH;
+    hmi_control_commands = hmi_scan_setup;
+    hmi_control_index = 0;
+    hmi_result_requested = 0;
+    hmi_result_pending = 0;
+    hmi_startup_pending = 0;
+    hmi_startup_retries = HMI_STARTUP_RETRIES;
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    HMI_DWT_CTRL |= 1UL;
+    hmi_startup_tick = HMI_DWT_CYCCNT;
     memset((void *)hmi_pending_scan, 0, sizeof(hmi_pending_scan));
     memset(hmi_tx_frame, 0, sizeof(hmi_tx_frame));
     memset(saoma_data, 0, sizeof(saoma_data));
@@ -152,6 +260,7 @@ void uart_init5()
     USART_Init(UART5, &USART_InitStructure); //初始化串口5
     USART_ITConfig(UART5, USART_IT_RXNE, ENABLE);//开启串口5接收中断
     USART_Cmd(UART5, ENABLE);                    //使能串口5
+    USART_ITConfig(UART5, USART_IT_TXE, ENABLE); /* HMI initial page visibility. */
 
 
 }
@@ -634,6 +743,7 @@ void Scanner_DisplayInit(void)
 void Scanner_DisplayPoll(uint32_t elapsed_ms)
 {
     if ((SCB->ICSR & 0x1FFU) != 0) return;   /* 中断里不轮询、不刷屏 */
+    HMI_PollStartup();
     Scanner_PollReceive();
     if (!scanner_oled_enabled) return;
 #if GYRO_OLED_DEBUG_ENABLE || CAMERA_OLED_DEBUG_ENABLE
@@ -653,6 +763,9 @@ void Gyro_DisplayPoll(void)
 {
 #if GYRO_OLED_DEBUG_ENABLE || CAMERA_OLED_DEBUG_ENABLE
     uint32_t now;
+#endif
+    HMI_PollStartup();
+#if GYRO_OLED_DEBUG_ENABLE || CAMERA_OLED_DEBUG_ENABLE
     if ((SCB->ICSR & 0x1FFU) != 0 || !scanner_oled_enabled) return;
     now = GYRO_DWT_CYCCNT;
     if ((uint32_t)(now - gyro_oled_cycles) < (SystemCoreClock / 5UL)) return;
