@@ -50,7 +50,8 @@ static uint8_t hmi_tx_index = HMI_FRAME_LENGTH;
  * GB2312 bytes are explicit; both displayed counts are fixed at 12 as requested.
  */
 static const uint8_t hmi_scan_setup[] =
-    HMI_PAGE0_SELECT;
+    HMI_PAGE0_SELECT
+    "page0.t0.txt=\"XXX+XXX+\\rXXX+XXX\"\xFF\xFF\xFF";
 static const uint8_t hmi_result_commands[] =
     HMI_PAGE0_SELECT
     "page0.t0.txt=\""
