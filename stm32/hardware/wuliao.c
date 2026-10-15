@@ -32,6 +32,7 @@ int fang2=-16;
 
 int zhua=167;
 int fang=150;
+int wanquankai=130;
 int guiwei=162;
 
 int speed_hua=500;

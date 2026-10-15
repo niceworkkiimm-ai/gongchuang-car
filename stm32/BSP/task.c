@@ -347,6 +347,7 @@ void yuanliao()
 
 void cujiagong()
 {
+	
     /* First coarse-processing round only; pixel X grows right, Y grows down. */
     const int ring_center_x = 148;
     const int ring_center_y = 128;
@@ -358,7 +359,7 @@ void cujiagong()
 	car(2,speed,22250*4);
 	delay_ms(50);
 	zhou(guiwei);    //夹子正对物料
-	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降
+	Emm_V5_Pos_Control(5, 1, 500, 200, 11000, 0, 0);    //升降台降
 	delay_ms(350);
 	car(6,speed,4450*4);
 	delay_ms(200);
@@ -377,7 +378,7 @@ void cujiagong()
 		fwuliao1();
 		
 		if (saoma_data[5] == '2'){
-			car(2,500,1850*4);
+			car(2,500,1850*4); 
 				fuwei();
 			vision_at('5', ring_center_x, ring_center_y);
 			fwuliao2();
@@ -574,7 +575,7 @@ void zancunqu()
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
-	car(2,speed,16000*2); 
+	car(2,speed,31500); 
 	delay_ms(300);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
@@ -772,7 +773,7 @@ void cujiagong2()
 	car(6,speed,4500*4);
 	delay_ms(300);
 	car(0,0,0);
-	car(2,speed,22250*4);
+	car(2,speed,22375*4);
 	delay_ms(50);
 	zhou(guiwei);    //夹子正对物料
 	Emm_V5_Pos_Control(5, 1, 500, 200, 8200, 0, 0);    //升降台降
@@ -1000,6 +1001,10 @@ void zancunqu2()
 		car(0,-180,0);
 	car(2,speed,16250*2); 
 	delay_ms(300);
+	if (anglea<180 && anglea>=0)
+		car(0,180,0);
+	else if( anglea>-180 && anglea <=0)
+		car(0,-180,0);
 	
 
 	zhou(guiwei);    //夹子正对物料
@@ -1074,11 +1079,11 @@ void qidian()
 	//调正
 	zhou(fang2);
 	delay_ms(100);
-	car(12,speed,28000);
+	car(12,speed,26000);
 	delay_ms(200);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,76000);
+	car(2,speed,78000);
 	delay_ms(200);
 	car(0,90,0);
 	delay_ms(50);
