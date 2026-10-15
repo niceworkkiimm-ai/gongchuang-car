@@ -306,8 +306,8 @@ void yuanliao()
 	//delay_ms(200);
 	// 原car(10,speed,0)已包含在dir12中，不再重复执行。
 	//delay_ms(400);
-	delay_ms(100);
-	car(0,90,0);			//
+	delay_ms(50);
+	car(0,90,0);
 	delay_ms(100);
 	car(1,speed,32000);	//走到中心
 	delay_ms(100);
@@ -576,6 +576,10 @@ void zancunqu()
 		car(0,-180,0);
 	car(2,speed,16000*2); 
 	delay_ms(300);
+	if (anglea<180 && anglea>=0)
+		car(0,180,0);
+	else if( anglea>-180 && anglea <=0)
+		car(0,-180,0);
 	
 
 //	/* Wang Kai route: inter-station travel. */

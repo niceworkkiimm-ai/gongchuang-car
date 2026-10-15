@@ -18,11 +18,9 @@ extern volatile float global_angle;
 
 /* car(0) only: keep the user's angular tolerance. */
 #define CAR_HEADING_TOLERANCE_DEG 0.4f
-#define CAR_HEADING_MEDIUM_ZONE_DEG 10.0f
-#define CAR_HEADING_FINE_ZONE_DEG 2.0f
-#define CAR_HEADING_FAST_RPM 10U
-#define CAR_HEADING_MEDIUM_RPM 3U
-#define CAR_HEADING_FINE_RPM 1U
+#define CAR_HEADING_FINE_ZONE_DEG 1.5f
+#define CAR_HEADING_FAST_RPM 13U /* Project 10 velocity; acceleration remains 10. */
+#define CAR_HEADING_FINE_RPM 2U
 #define CAR_HEADING_COMMAND_GAP_MS 10U
 #define CAR_HEADING_BRAKE_SECONDS 0.07f
 #define CAR_HEADING_MAX_BRAKE_DEG 1.0f
@@ -100,15 +98,13 @@ static uint8_t Car_AlignHeading(float target)
     uint8_t moving = 0, direction = 0, requested_direction, new_frame;
     uint8_t stable_started = 0, stable_frames = 0, window_logged = 0;
     uint8_t stable_in_window = 0;
+    uint8_t initial_start = 1;
 
     car_heading_status = CAR_HEADING_RUNNING;
     Car_ReadHeading(&yaw, &rate, &last_frames);
     start = CameraDebug_NowMs();
     last_frame_ms = start;
-    /* Cancel any residual arc/position motion before starting a new heading. */
-    delay_ms(CAR_HEADING_COMMAND_GAP_MS);
-    Car_StopHeadingWheels();
-    stopped_ms = CameraDebug_NowMs();
+    stopped_ms = start;
 
     while (1)
     {
@@ -140,7 +136,29 @@ static uint8_t Car_AlignHeading(float target)
             window_logged = 1;
         }
         requested_direction = error >= 0.0f ? 1U : 0U;
-        if (moving)
+        if (initial_start)
+        {
+            /* Start on a fresh angle without the final-settling wait. */
+            if (new_frame)
+            {
+                initial_start = 0;
+                if (distance > CAR_HEADING_TOLERANCE_DEG)
+                {
+                    requested_rpm = distance > CAR_HEADING_FINE_ZONE_DEG ?
+                        CAR_HEADING_FAST_RPM : CAR_HEADING_FINE_RPM;
+                    Car_SendHeadingVelocity(requested_direction, requested_rpm);
+                    direction = requested_direction;
+                    commanded_rpm = requested_rpm;
+                    moving = 1;
+                }
+                else
+                {
+                    Car_StopHeadingWheels();
+                    stopped_ms = CameraDebug_NowMs();
+                }
+            }
+        }
+        else if (moving)
         {
             brake = CAR_HEADING_TOLERANCE_DEG;
             if (commanded_rpm == CAR_HEADING_FINE_RPM &&
@@ -163,10 +181,8 @@ static uint8_t Car_AlignHeading(float target)
             }
             else
             {
-                requested_rpm = distance > CAR_HEADING_MEDIUM_ZONE_DEG ?
-                    CAR_HEADING_FAST_RPM :
-                    (distance > CAR_HEADING_FINE_ZONE_DEG ?
-                     CAR_HEADING_MEDIUM_RPM : CAR_HEADING_FINE_RPM);
+                requested_rpm = distance > CAR_HEADING_FINE_ZONE_DEG ?
+                    CAR_HEADING_FAST_RPM : CAR_HEADING_FINE_RPM;
                 /* Only reduce an active turn; resume speed after a full stop. */
                 if (requested_rpm < commanded_rpm)
                 {
@@ -210,10 +226,8 @@ static uint8_t Car_AlignHeading(float target)
                         car_heading_status = CAR_HEADING_SUCCESS;
                         return 1;
                     }
-                    requested_rpm = distance > CAR_HEADING_MEDIUM_ZONE_DEG ?
-                        CAR_HEADING_FAST_RPM :
-                        (distance > CAR_HEADING_FINE_ZONE_DEG ?
-                         CAR_HEADING_MEDIUM_RPM : CAR_HEADING_FINE_RPM);
+                    requested_rpm = distance > CAR_HEADING_FINE_ZONE_DEG ?
+                        CAR_HEADING_FAST_RPM : CAR_HEADING_FINE_RPM;
                     Car_SendHeadingVelocity(requested_direction, requested_rpm);
                     direction = requested_direction;
                     commanded_rpm = requested_rpm;

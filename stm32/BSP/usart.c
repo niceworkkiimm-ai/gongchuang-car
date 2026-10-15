@@ -19,7 +19,7 @@ __IO uint8_t rxCount = 0;
 	*/
 
 /* Parsed at byte reception so adjacent motor replies cannot overwrite each other.
- * Active only during WL_dingwei wheel positioning. The legacy FIFO stays intact.
+ * Active only during tracked wheel position moves. The legacy FIFO stays intact.
  * FD replies carry no transaction number: never overlap two tracked moves.
  */
 volatile uint8_t wheel_reply_done_mask = 0;
