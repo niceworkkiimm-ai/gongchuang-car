@@ -52,6 +52,10 @@ static uint8_t hmi_tx_index = HMI_FRAME_LENGTH;
 static const uint8_t hmi_scan_setup[] =
     HMI_PAGE0_SELECT
     "page0.t0.txt=\"XXX+XXX+\\rXXX+XXX\"\xFF\xFF\xFF";
+/* Retry visibility/text only: re-entering page0 can expose its default text. */
+static const uint8_t hmi_startup_retry_commands[] =
+    "vis t1,0\xFF\xFF\xFF" "vis t0,1\xFF\xFF\xFF"
+    "page0.t0.txt=\"XXX+XXX+\\rXXX+XXX\"\xFF\xFF\xFF";
 static const uint8_t hmi_result_commands[] =
     HMI_PAGE0_SELECT
     "page0.t0.txt=\""
@@ -143,7 +147,7 @@ static void HMI_TransmitByte(void)
         }
         if (!hmi_control_commands && hmi_startup_pending && !hmi_result_requested)
         {
-            hmi_control_commands = hmi_scan_setup;
+            hmi_control_commands = hmi_startup_retry_commands;
             hmi_control_index = 0;
             hmi_startup_pending = 0;
         }

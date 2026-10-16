@@ -188,6 +188,8 @@ int main(void)
 	cujiagong2();
 	zancunqu2();
 	qidian();
+	
+	delay_ms(500);
 	GyroLog_TaskComplete();
 	HMI_ShowTaskComplete(); /* After the original final return has finished. */
 
