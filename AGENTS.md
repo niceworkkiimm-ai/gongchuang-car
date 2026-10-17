@@ -1,4 +1,5 @@
 # 本项目协作约定
+- 2026-10-17 用户更新：当前唯一修改和烧录工程改为 `C:\Users\Kim\Desktop\决赛1版`，不得再修改“小车只加通信版本”文件夹；此条优先于下方历史路径。
 
 - 2026-10-09 用户重新确认：当前修改和烧录工程为 `C:\Users\Kim\Desktop\小车只加通信版本`；`C:\Users\Kim\Desktop\工创` 保留旧版和原始资料，不用旧版覆盖当前工程。
 - 本地 Git 仓库为 `D:\工创Git仓库\gongchuang-car`。后续每次修改和验证后，同一提交必须推送到 `origin`（gongchuang-car）及 `team`（gongchuang-car-team）。分别确认上传结果，不把单仓库成功说成双仓库成功。

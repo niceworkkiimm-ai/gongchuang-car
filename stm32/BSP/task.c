@@ -301,7 +301,7 @@ void yuanliao()
 	delay_ms(50);
 	car(2,speed,52000);
 	delay_ms(100);
-	car(13,speed,51000-CAR_ARC_90_TRIM_PULSES); // 直行到扫码区并接转弯，合为一次运动
+	car(13,speed,49000-CAR_ARC_90_TRIM_PULSES); // 直行到扫码区并接转弯，合为一次运动
 	//car(0,0,0);
 	//delay_ms(200);
 	// 原car(10,speed,0)已包含在dir12中，不再重复执行。
@@ -309,15 +309,19 @@ void yuanliao()
 	delay_ms(50);
 	car(0,90,0);
 	delay_ms(100);
-	car(1,speed,32000);	//走到中心
+	car(1,speed,25000);	//少7000到中心后面补偿
 	delay_ms(100);
 	car(0,90,0);
 	delay_ms(100);
+	
+	
 	
 
 	zhuazikai();
 	zhuanpan0();
 	delay_ms(100);
+	
+	
 	fuwei();
 	
 	
@@ -353,6 +357,11 @@ void cujiagong()
     const int ring_center_y = 128;
 
 	/* Wang Kai route: inter-station travel. */
+	
+	car(1,speed,6500);	//走到中心
+	delay_ms(100);
+	
+	
 	car(6,speed,4500*4);
 	delay_ms(200);
 	car(0,0,0);
@@ -564,12 +573,46 @@ void zancunqu()
     /* Same physical tray order as cujiagong: 3, 2, 1. */
     const int ring_center_x = 148;
     const int ring_center_y = 128;
+    /* Only this function: wait for fresh ring coordinates, then nudge once. */
+    const uint32_t ring_wait_ms = 4000UL;
+    const int ring_search_speed = 500;
+    const int ring_search_pulses = 1000;
+#define ZANCUN_RING_ALIGN(task_id) do { \
+    uint32_t wait_start, first_frames, irq_mask, now_ms, frame_ms; \
+    uint8_t target_ready; \
+    Usart_SendByte4(UART4, (task_id)); \
+    irq_mask = __get_PRIMASK(); \
+    __disable_irq(); \
+    first_frames = camera_debug_frames; \
+    wait_start = CameraDebug_NowMs(); \
+    __set_PRIMASK(irq_mask); \
+    for (;;) { \
+        irq_mask = __get_PRIMASK(); \
+        __disable_irq(); \
+        now_ms = CameraDebug_NowMs(); \
+        frame_ms = camera_debug_last_frame_ms; \
+        target_ready = camera_debug_frames != first_frames && \
+            maixcam_mode == 7 && maixcam_found && \
+            x > 0 && x < 320 && y > 0 && y < 240 && \
+            (uint32_t)(now_ms - frame_ms) < 1500UL && \
+            (uint32_t)(frame_ms - wait_start) <= ring_wait_ms; \
+        __set_PRIMASK(irq_mask); \
+        if (target_ready) break; \
+        if ((uint32_t)(now_ms - wait_start) >= ring_wait_ms) { \
+            car(4, ring_search_speed, ring_search_pulses); \
+            break; \
+        } \
+        delay_ms(1); \
+    } \
+    vision_at((task_id), ring_center_x, ring_center_y); \
+} while (0)
+
 	
 	
 	car(0,-90,0);
 	delay_ms(200);
 	
-	car(12,speed,43000-CAR_ARC_90_TRIM_PULSES); 
+	car(12,speed,43500-CAR_ARC_90_TRIM_PULSES); 
 	delay_ms(50);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
@@ -609,19 +652,19 @@ void zancunqu()
 	if (saoma_data[6] == '1'){
 		car(1,500,1850*4);
 			fuwei();		//识别并且调整
-		vision_at('4', ring_center_x, ring_center_y);
+		ZANCUN_RING_ALIGN('4');
 		fwuliao1();
 		
 		if (saoma_data[5] == '2'){
 			car(2,500,1850*4);
 				fuwei();
-			vision_at('5', ring_center_x, ring_center_y);
+			ZANCUN_RING_ALIGN('5');
 			fwuliao2();
 			
 			if (saoma_data[4]=='3'){
 				car(2,500,1850*4);
 				fuwei();
-				vision_at('6', ring_center_x, ring_center_y);
+				ZANCUN_RING_ALIGN('6');
 				fwuliao3();
 			}
 			}
@@ -629,12 +672,12 @@ void zancunqu()
 		if (saoma_data[5] == '3'){
 			car(2,500,3700*4);
 				fuwei();
-			vision_at('6', ring_center_x, ring_center_y);
+			ZANCUN_RING_ALIGN('6');
 			fwuliao2();
 			if (saoma_data[4] == '2'){
 				car(1,500,1850*4);
 				fuwei();
-				vision_at('5', ring_center_x, ring_center_y);
+				ZANCUN_RING_ALIGN('5');
 				fwuliao3();
 			}
 		}
@@ -643,19 +686,19 @@ void zancunqu()
 	
 	if (saoma_data[6] == '2'){
 			fuwei();
-		vision_at('5', ring_center_x, ring_center_y);
+		ZANCUN_RING_ALIGN('5');
 		fwuliao1();
 		
 		if (saoma_data[5] == '1'){
 			car(1,500,1850*4);
 				fuwei();
-			vision_at('4', ring_center_x, ring_center_y);
+			ZANCUN_RING_ALIGN('4');
 			fwuliao2();
 			if (saoma_data[4] == '3'){
 				
 				car(2,500,3700*4);
 				fuwei();
-				vision_at('6', ring_center_x, ring_center_y);
+				ZANCUN_RING_ALIGN('6');
 				fwuliao3();
 			}
 		}
@@ -663,12 +706,12 @@ void zancunqu()
 		if (saoma_data[5] == '3'){
 			car(2,500,1850*4);
 				fuwei();
-			vision_at('6', ring_center_x, ring_center_y);
+			ZANCUN_RING_ALIGN('6');
 			fwuliao2();
 			if (saoma_data[4] == '1'){
 				car(1,500,3700*4);
 				fuwei();
-				vision_at('4', ring_center_x, ring_center_y);
+				ZANCUN_RING_ALIGN('4');
 				fwuliao3();
 			}
 		}
@@ -678,18 +721,18 @@ void zancunqu()
 	if (saoma_data[6] == '3'){
 		car(2,500,1850*4);
 		fuwei();
-		vision_at('6', ring_center_x, ring_center_y);
+		ZANCUN_RING_ALIGN('6');
 		fwuliao1();
 		
 		if (saoma_data[5] == '2'){
 			car(1,500,1850*4);
 				fuwei();
-			vision_at('5', ring_center_x, ring_center_y);
+			ZANCUN_RING_ALIGN('5');
 			fwuliao2();
 			if (saoma_data[4] == '1'){
 				car(1,500,1850*4);
 				fuwei();
-				vision_at('4', ring_center_x, ring_center_y);
+				ZANCUN_RING_ALIGN('4');
 				fwuliao3();
 			}
 		}
@@ -697,12 +740,12 @@ void zancunqu()
 		if (saoma_data[5] == '1'){
 			car(1,500,3700*4);
 				fuwei();
-			vision_at('4', ring_center_x, ring_center_y);
+			ZANCUN_RING_ALIGN('4');
 			fwuliao2();
 			if (saoma_data[4] == '2'){
 				car(2,500,1850*4);
 				fuwei();
-				vision_at('5', ring_center_x, ring_center_y);
+				ZANCUN_RING_ALIGN('5');
 				fwuliao3();
 			}
 		}
@@ -718,6 +761,7 @@ void zancunqu()
         car(1,500,1850*4); // 从3号圆环回到中间2号圆环
     /* scan[4] == '2': already at center; no movement. */
 
+#undef ZANCUN_RING_ALIGN
 }
 
 
@@ -733,11 +777,11 @@ void yuanliao2()
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
 	delay_ms(300);
-	car(12,speed,43000-CAR_ARC_90_TRIM_PULSES);
+	car(12,speed,42500-CAR_ARC_90_TRIM_PULSES);	//已经少拐1000
 	delay_ms(50);
 	car(0,90,0);
 	delay_ms(50);
-	car(2,speed,30000);
+	car(2,speed,37000);		//比中心多走7000
 	delay_ms(300);
 
 	zhuazikai();
@@ -770,8 +814,11 @@ void cujiagong2()
     const int ring_center_x = 148;
     const int ring_center_y = 128;
 	/* Wang Kai route: inter-station travel. */
+	
+	car(1,speed,6500);	
+	delay_ms(100);	
 	car(6,speed,4500*4);
-	delay_ms(300);
+	delay_ms(200);
 	car(0,0,0);
 	car(2,speed,22375*4);
 	delay_ms(50);
@@ -993,13 +1040,14 @@ void zancunqu2()
 	car(0,-90,0);
 	delay_ms(200);
 	
-	car(12,speed,42000-CAR_ARC_90_TRIM_PULSES); 
+	car(12,speed,43500-CAR_ARC_90_TRIM_PULSES); 
 	delay_ms(50);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
 	else if( anglea>-180 && anglea <=0)
 		car(0,-180,0);
-	car(2,speed,16250*2); 
+	
+	car(2,speed,31500); 
 	delay_ms(300);
 	if (anglea<180 && anglea>=0)
 		car(0,180,0);
